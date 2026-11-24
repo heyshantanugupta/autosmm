@@ -67,3 +67,18 @@ test("checkDraft warns on unsupported claims and unbacked numbers together", () 
   );
   assert.ok(checks.filter((c) => c.level === "warn").length >= 2);
 });
+
+import { echoesTopic, topicFrom } from "../lib/claims.ts";
+
+test("topicFrom reads the topic line the app sends", () => {
+  assert.equal(topicFrom("Topic for this post: Why plans fail by Wednesday\nThis is only the subject."), "Why plans fail by Wednesday");
+  assert.equal(topicFrom("Rewrite shorter"), "");
+});
+
+test("an opening line that repeats the topic is flagged, a real hook is not", () => {
+  const topic = "Why a resume gap is not the problem people think it is";
+  assert.ok(echoesTopic("Why a resume gap is not the problem people think", topic));
+  assert.ok(!echoesTopic("Marta sent 40 applications in March and heard back from none, then she changed one line.", topic));
+  const flagged = checkDraft({ body: "Why a resume gap is not the problem people think it is.\nHere is more.", claimsUsed: [] }, SAMPLE_BRIEF, topic);
+  assert.ok(flagged.some((c) => c.level === "warn" && /repeats your topic/.test(c.message)));
+});

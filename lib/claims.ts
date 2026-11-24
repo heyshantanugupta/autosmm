@@ -89,9 +89,35 @@ function lines(text: string): string[] {
     .filter(Boolean);
 }
 
+/** The topic the user typed, taken from the "Topic for this post:" line the app sends. */
+export function topicFrom(instruction?: string): string {
+  return /^Topic for this post:\s*(.+)$/im.exec(instruction ?? "")?.[1]?.trim() ?? "";
+}
+
+const words = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter(Boolean);
+
+/**
+ * True when a post's opening line is the user's topic or a close copy of it. A topic is a brief for the
+ * writer, so a draft that just repeats it and adds a line is not content.
+ */
+export function echoesTopic(opening: string, topic: string): boolean {
+  const t = words(topic);
+  const o = words(opening);
+  if (t.length < 3 || o.length < 3) return false;
+  const oSet = new Set(o);
+  const shared = t.filter((w) => oSet.has(w)).length;
+  return shared / t.length >= 0.8 && shared / o.length >= 0.6;
+}
+
 /** Run every check against one draft and return human-readable results. */
-export function checkDraft(draft: Pick<Draft, "body" | "claimsUsed">, intake: Intake): DraftCheck[] {
+export function checkDraft(draft: Pick<Draft, "body" | "claimsUsed"> & { hook?: string }, intake: Intake, topic = ""): DraftCheck[] {
   const checks: DraftCheck[] = [];
+  if (topic) {
+    const firstLine = draft.body.split("\n").find((l) => l.trim()) ?? "";
+    if (echoesTopic(draft.hook || firstLine, topic) || echoesTopic(firstLine, topic)) {
+      checks.push({ level: "warn", message: "The opening line repeats your topic. Press Rewrite and ask for a specific scene instead." });
+    }
+  }
   const source = allowedSource(intake);
 
   const claimResults = verifyClaims(draft.claimsUsed, source);

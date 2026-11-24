@@ -14,4 +14,8 @@ export const BLANK_INTAKE: Intake = {
   tone: "",
   currentState: "",
   voiceSamples: "",
+  brandColors: "",
+  visualStyle: "",
+  logoNote: "",
+  watermark: "",
 };

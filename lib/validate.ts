@@ -41,6 +41,10 @@ export function parseIntake(raw: unknown): Intake {
     tone: str(r.tone, 1000, "Tone"),
     currentState: str(r.currentState, MAX_LONG, "Current state"),
     voiceSamples: str(r.voiceSamples, 3000, "Voice samples"),
+    brandColors: str(r.brandColors, 300, "Brand colors"),
+    visualStyle: str(r.visualStyle, 300, "Visual style"),
+    logoNote: str(r.logoNote, 300, "Logo note"),
+    watermark: str(r.watermark, 100, "Watermark"),
   };
   return intake;
 }

@@ -1,5 +1,5 @@
 import { applyBatch } from "@/lib/batch";
-import { checkDraft } from "@/lib/claims";
+import { checkDraft, topicFrom } from "@/lib/claims";
 import { toText, toTextList } from "@/lib/coerce";
 import { demoDrafts } from "@/lib/demo";
 import { errorResponse, isDemo, json, requestProvider, requireKey } from "@/lib/http";
@@ -62,6 +62,7 @@ export async function POST(req: Request) {
             linkSlug: str(d.linkSlug),
             bestTime: str(d.bestTime),
             visualIdea: str(d.visualIdea),
+            imageScene: str(d.imageScene),
             claimsUsed: strList(d.claimsUsed),
             notes: str(d.notes),
           };
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
       ...d,
       id: `${d.postTypeId}-${i}-${Math.random().toString(36).slice(2, 8)}`,
       batch: request.batch,
-      checks: checkDraft(d, effective),
+      checks: checkDraft(d, effective, topicFrom(request.instruction)),
     }));
 
     return json({ drafts, demo: isDemo(req) });
