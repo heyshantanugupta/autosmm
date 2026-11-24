@@ -1,8 +1,27 @@
+<div align="center">
+
+<img src="build/icon.png" alt="AutoSMM logo" width="88">
+
 # AutoSMM
 
-Your Social Media Marketing Solution. Enter your product details. The app proposes a social media strategy, you pick a platform and post types, and it writes drafts you edit and post yourself.
+**Your Social Media Marketing Solution**
 
-**It never posts for you.** No auto-posting, no automated connection requests, no automated replies. You copy the draft and publish it.
+Describe your product once. Get a social media strategy, then ready-to-edit posts for LinkedIn, Instagram, X, Facebook, YouTube, TikTok and Reddit.
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-5b47f5)](LICENSE)
+![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-12b5a2)
+![Free to try](https://img.shields.io/badge/free%20to%20try-Gemini%20%7C%20Groq%20%7C%20Ollama-e5407e)
+![Bring your own key](https://img.shields.io/badge/bring%20your%20own-API%20key-f5a524)
+![Human in the loop](https://img.shields.io/badge/you%20post-never%20auto--posts-1a7f64)
+
+<br>
+
+<img src="docs/images/drafts.png" alt="AutoSMM drafts screen with fact checks beside an editable post" width="860">
+
+</div>
+
+> [!IMPORTANT]
+> **It never posts for you.** No auto-posting, no automated connection requests, no automated replies. You edit the draft, copy it, and publish it yourself.
 
 ## Download the app (Windows and Mac)
 
@@ -16,12 +35,14 @@ Open the [Releases page](https://github.com/heyshantanugupta/autosmm/releases) a
 | Mac with Apple chip (M1 or newer) | `AutoSMM-<version>-mac-arm64.dmg` |
 | Mac with Intel chip | `AutoSMM-<version>-mac-x64.dmg` |
 
-The apps are not code signed yet, so the first launch shows a warning:
+> [!WARNING]
+> The apps are not code signed yet, so the first launch shows a warning. This is expected.
+>
+> - **Windows:** choose "More info", then "Run anyway".
+> - **Mac:** drag AutoSMM to Applications, then right-click it and choose Open the first time. If macOS says the app is damaged, run `xattr -cr /Applications/AutoSMM.app` in Terminal once.
 
-- **Windows:** choose "More info", then "Run anyway".
-- **Mac:** drag AutoSMM to Applications, then right-click it and choose Open the first time. If macOS says the app is damaged, run `xattr -cr /Applications/AutoSMM.app` in Terminal once.
-
-Desktop extras: local models through Ollama work, "Download PDF" saves a real PDF file, and links such as "Post on LinkedIn" open in your normal browser.
+> [!TIP]
+> The desktop app has a few extras: local models through Ollama work, "Download PDF" saves a real PDF file, and links such as "Post on LinkedIn" open in your normal browser.
 
 ## Choose how it writes
 
@@ -30,20 +51,34 @@ Open Settings inside the app and pick one:
 - **Free:** Google Gemini, Groq or OpenRouter free models. Create a free key, paste it in Settings, done. Free tiers have rate limits.
 - **Local and free:** Ollama, running on your own computer (works in the desktop app and when you run from source).
 - **Paid:** Anthropic Claude (best quality) or OpenAI ChatGPT. Both need an API key, which is billed separately from any chat subscription.
-- **No key at all:** demo mode. It uses templates, not a model, so you can try the flow.
+- **No key at all:** turn on Demo mode in Settings. It builds the whole flow from templates, not a model, so you can look around first.
 
-Free-tier terms and model names change, and providers retire models. If you see "model not available", open Settings, paste your key and click **Check available models** to list what your key can use, then pick one.
+> [!NOTE]
+> Free-tier terms and model names change, and providers retire models. If you see "model not available", open Settings, paste your key and click **Check available models** to list what your key can use, then pick one.
 
 ## What it does
 
-1. **Brief**: product, facts, audience, goal, channels, real proof, things never to say, tone.
-2. **Strategy**: positioning, audiences, content themes, platform roles, weekly rhythm, how to measure, risks, and gaps in your brief.
-3. **Platform and post types**: LinkedIn, Instagram, X, Facebook, YouTube, TikTok, Reddit, each with post types that fit its norms.
-4. **Drafts**: editable text with a character counter, copy button, "rewrite this draft" with an instruction, and Markdown export.
+1. **Brief:** product, facts, audience, goal, channels, real proof, things never to say, tone. Save it as a file and load it any time.
+2. **Strategy:** positioning, audiences, content themes, platform roles, weekly rhythm, how to measure, risks, and gaps in your brief. Download it as PDF or Word.
+3. **Platform and post types:** each platform has post types that fit its norms. Set a tone, extra rules and a feature to focus on for each batch.
+4. **Drafts:** editable text with a character counter, a fact check that re-runs as you type, a tracked link with setup help, and "Post on" buttons that copy the post and open the platform.
+5. **Images:** say yes to an image and get a ready-to-paste prompt, plus buttons that open Gemini or ChatGPT.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/brief.png" alt="The brief step"><br><sub><b>1. Tell it about your product</b></sub></td>
+    <td width="50%"><img src="docs/images/strategy.png" alt="The strategy step"><br><sub><b>2. Review the strategy</b></sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/images/drafts.png" alt="The drafts step"><br><sub><b>3. Edit drafts and copy them</b></sub></td>
+    <td width="50%"><img src="docs/images/image-prompt.png" alt="The image prompt panel"><br><sub><b>4. Get an image prompt for Gemini or ChatGPT</b></sub></td>
+  </tr>
+</table>
 
 ## Bring your own key
 
-You never pay for other people's usage: each user brings their own key for the provider they choose.
+> [!NOTE]
+> You never pay for other people's usage: each user brings their own key for the provider they choose.
 
 - Your key is kept in the browser tab (sessionStorage). It is saved to localStorage only if you tick "remember".
 - It is sent to this app's own API routes in a request header and passed straight to the chosen provider for that one call.
@@ -102,7 +137,10 @@ components/        the four steps, settings panel and platform marks
 
 ## For developers
 
-Most people should use the downloads above. To run from source you need [Node.js](https://nodejs.org) 20 or newer.
+> [!NOTE]
+> Most people should use the downloads above. This section is only for running the project from source.
+
+To run from source you need [Node.js](https://nodejs.org) 20 or newer.
 
 ```bash
 npm install
