@@ -1,5 +1,6 @@
 import { DEFAULT_PROVIDER, getProvider, type ProviderId } from "./providers";
 import type { Draft, Intake, PlanItem, ResultEntry, Review, Strategy } from "./types";
+import { BLANK_INTAKE } from "./presets";
 
 export interface Settings {
   provider: ProviderId;
@@ -104,7 +105,8 @@ export function loadWorkspace(): Workspace | null {
   if (!raw) return null;
   try {
     const w = JSON.parse(raw) as Workspace;
-    return { ...w, strategy: cleanStrategy(w.strategy ?? null) };
+    // Work saved by an older version may lack newer fields, so start from a blank brief and overlay it.
+    return { ...w, intake: { ...BLANK_INTAKE, ...(w.intake ?? {}) }, strategy: cleanStrategy(w.strategy ?? null) };
   } catch {
     return null;
   }

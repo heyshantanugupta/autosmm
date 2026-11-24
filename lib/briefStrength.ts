@@ -19,7 +19,7 @@ export function briefStrength(i: Intake): Strength {
     { points: 15, got: i.audience.trim() ? 15 : 0, ask: "Say who it is for." },
     { points: 30, got: Math.min(facts, 5) * 6, ask: facts === 0 ? "Add a few facts about your product." : "Add more facts. Five or more makes the posts much more specific." },
     { points: 10, got: i.proof.trim() ? 10 : 0, ask: "Add any real proof, like press or a number you can stand behind." },
-    { points: 10, got: i.tone.trim() || i.voiceSamples.trim() ? 10 : 0, ask: "Describe how you want to sound, or paste a few of your own posts." },
+    { points: 10, got: i.tone.trim() || (i.voiceSamples ?? "").trim() ? 10 : 0, ask: "Describe how you want to sound, or paste a few of your own posts." },
     { points: 10, got: i.doNotSay.trim() ? 10 : 0, ask: "List anything the posts must never say." },
   ];
   const score = checks.reduce((n, c) => n + c.got, 0);

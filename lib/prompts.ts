@@ -33,7 +33,7 @@ export function formatIntake(intake: Intake): string {
     `\nNEW FEATURES / NEWS:\n${lines(intake.newUpdates)}`,
     `\nDO NOT SAY / DO NOT DO:\n${lines(intake.doNotSay)}`,
     `\nCURRENT STATE OF THE SOCIAL ACCOUNTS:\n${intake.currentState || "(none provided)"}`,
-    voiceBlock(intake.voiceSamples),
+    voiceBlock(intake.voiceSamples ?? ""),
   ].filter(Boolean).join("\n");
 }
 
