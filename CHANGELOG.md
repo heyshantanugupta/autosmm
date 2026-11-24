@@ -2,15 +2,16 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.10
+
+- **Settings tabs.** Settings is now split into Model, Projects, UI Scale and Version. It opens on Model, and each button shows only its own section. The Projects list now sits open inside its tab.
+- Light animations: Settings fades in and out, and tabs, buttons, menu items and plan rows react when you hover or press them. They use only simple fades and small moves, and switch off if your computer is set to reduce motion.
+- The main card on Today widens its green edge and lifts when you hover it, and the number tiles and plan rows highlight too.
+
 ## v1.2.9
 
 - **UI Scale.** Settings has a UI Scale choice (80% to 120%). The app now starts a little smaller at 90%.
-- Settings has quick buttons that jump to Model, Version and UI Scale.
 - **Write tab.** After the next 7 days, "Show whole plan" lists every planned post, and the list switches to the whole plan on its own when nothing is due this week. "Write a different post" is now "Write my own post", and its page has "Back to my drafts".
-
-- Light animations: Settings fades in and out, tabs, buttons, menu items and plan rows react when you hover or press them. They use only simple fades and small moves, and switch off if your computer is set to reduce motion.
-- The main card on Today widens its green edge and lifts when you hover it, and the number tiles and plan rows highlight too.
-- Settings is now split into Model, Projects, UI Scale and Version. It opens on Model, and each button shows only its own section.
 - The side menu now stays at the left edge on full screen instead of floating in the middle.
 - Settings now has a Projects section (switch, new, rename, duplicate, export, import, delete).
 
