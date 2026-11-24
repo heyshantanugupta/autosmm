@@ -45,7 +45,7 @@ Click a button, open the file you downloaded, and follow the prompts. Other opti
 > The apps are not code signed yet, so the first launch shows a warning. This is expected.
 >
 > - **Windows:** choose "More info", then "Run anyway".
-> - **Mac:** drag AutoSMM to Applications, then right-click it and choose Open the first time. If macOS says the app is damaged, run `xattr -cr /Applications/AutoSMM.app` in Terminal once.
+> - **Mac:** drag AutoSMM to Applications and open it. When macOS says it could not verify the app, click **Done** (not Move to Trash), then open **System Settings**, go to **Privacy & Security**, scroll to Security, click **Open Anyway** next to AutoSMM and confirm. You only do this once. If you prefer Terminal, run `xattr -cr /Applications/AutoSMM.app` and open the app again.
 
 > [!TIP]
 > The desktop app has a few extras: local models through Ollama work, "Download PDF" saves a real PDF file, and links such as "Post on LinkedIn" open in your normal browser.
