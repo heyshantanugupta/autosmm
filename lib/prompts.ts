@@ -227,3 +227,42 @@ ${batchSection(req.batch)}${req.instruction ? `\nEXTRA DIRECTION FROM THE USER (
 PRODUCT BRIEF:
 ${formatIntake(intake)}`;
 }
+
+export const IMPORT_SYSTEM = `You read the text of a product's website and fill in the first draft of a social media brief for the owner.
+
+Rules:
+- Use ONLY what the page text says. Copy or closely paraphrase. Never invent numbers, customers, quotes, awards, pricing, features or results.
+- If the page does not say something, leave that field empty and list it under "missing".
+- "facts" are plain, checkable statements about the product, one per item, each one short.
+- "proof" is only real proof stated on the page (press mentions, named customers, numbers with a source). If there is none, return an empty list.
+- "audience" is who the page says the product is for.
+- Write plain words. No hype.`;
+
+export const IMPORT_TOOL = {
+  name: "submit_brief",
+  description: "Submit the first draft of the brief, built only from the page text.",
+  schema: {
+    type: "object",
+    properties: {
+      productName: { type: "string" },
+      oneLiner: { type: "string", description: "One sentence on what it is and who it helps." },
+      audience: { type: "string" },
+      facts: { type: "array", items: { type: "string" }, description: "5 to 12 short, checkable facts from the page." },
+      proof: { type: "array", items: { type: "string" } },
+      newUpdates: { type: "array", items: { type: "string" }, description: "Only launches or news the page announces." },
+      missing: { type: "array", items: { type: "string" }, description: "Useful things the page did not say, such as pricing or customer proof." },
+    },
+    required: ["productName", "oneLiner", "audience", "facts", "proof", "newUpdates", "missing"],
+  },
+} as const;
+
+export function importUserPrompt(url: string, s: { title: string; siteName: string; description: string; headings: string[]; text: string }): string {
+  return [
+    `WEBSITE: ${url}`,
+    `TITLE: ${s.title || "(none)"}`,
+    `SITE NAME: ${s.siteName || "(none)"}`,
+    `DESCRIPTION: ${s.description || "(none)"}`,
+    `HEADINGS:\n${s.headings.map((h) => `- ${h}`).join("\n") || "- (none)"}`,
+    `PAGE TEXT:\n${s.text}`,
+  ].join("\n");
+}

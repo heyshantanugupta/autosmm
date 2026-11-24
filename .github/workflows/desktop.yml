@@ -59,15 +59,24 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
+      # Use this version's section of CHANGELOG.md as the release notes, if there is one.
+      - name: Write release notes
+        env:
+          TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+        run: |
+          awk -v tag="## $TAG" '$0 == tag {on=1; next} /^## /{on=0} on' CHANGELOG.md > release-notes.md || true
+          if [ -s release-notes.md ]; then echo "NOTES=release-notes.md" >> "$GITHUB_ENV"; fi
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
           files: dist/*
-          generate_release_notes: true
+          body_path: ${{ env.NOTES }}
+          generate_release_notes: ${{ env.NOTES == '' }}
 
   # Point the README download buttons at the files of the release that was just published.
   readme:

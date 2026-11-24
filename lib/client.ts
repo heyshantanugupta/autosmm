@@ -1,4 +1,5 @@
 import type { Settings } from "./storage";
+import type { ImportedBrief } from "./importBrief";
 import type { Draft, Intake, Platform, Strategy } from "./types";
 
 async function post<T>(path: string, body: Record<string, unknown>, settings: Settings): Promise<T> {
@@ -18,6 +19,10 @@ async function post<T>(path: string, body: Record<string, unknown>, settings: Se
   const data = (await res.json().catch(() => ({}))) as { error?: string };
   if (!res.ok) throw new Error(data.error ?? "The request failed. Try again.");
   return data as T;
+}
+
+export function requestImport(url: string, settings: Settings) {
+  return post<{ brief: ImportedBrief; demo: boolean }>("/api/import", { url }, settings);
 }
 
 export function requestStrategy(intake: Intake, settings: Settings) {

@@ -1,0 +1,50 @@
+export interface SiteText {
+  title: string;
+  siteName: string;
+  description: string;
+  headings: string[];
+  text: string;
+}
+
+const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", rsquo: "'", lsquo: "'", rdquo: '"', ldquo: '"', ndash: "-", mdash: "-", hellip: "..." };
+
+function decode(s: string): string {
+  return s
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Math.min(Number(n), 0x10ffff)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(Math.min(parseInt(n, 16), 0x10ffff)))
+    .replace(/&([a-z]+);/gi, (m, n) => ENTITIES[n.toLowerCase()] ?? m);
+}
+
+const clean = (s: string) => decode(s.replace(/<[^>]*>/g, " ")).replace(/\s+/g, " ").trim();
+
+function meta(html: string, key: string): string {
+  for (const tag of html.match(/<meta\b[^>]*>/gi) ?? []) {
+    const name = /(?:name|property)\s*=\s*["']([^"']+)["']/i.exec(tag)?.[1]?.toLowerCase();
+    if (name !== key) continue;
+    const content = /content\s*=\s*"([^"]*)"|content\s*=\s*'([^']*)'/i.exec(tag);
+    return decode((content?.[1] ?? content?.[2] ?? "").trim());
+  }
+  return "";
+}
+
+/** Pull the readable parts out of a page: title, description, headings and body text. */
+export function extractSiteText(html: string, maxChars = 7000): SiteText {
+  const title = clean(/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] ?? "");
+  const body = html
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<(script|style|noscript|svg|template|iframe)\b[\s\S]*?<\/\1>/gi, " ");
+  const headings: string[] = [];
+  for (const m of body.matchAll(/<h([1-3])\b[^>]*>([\s\S]*?)<\/h\1>/gi)) {
+    const t = clean(m[2]);
+    if (t && !headings.includes(t)) headings.push(t);
+    if (headings.length >= 30) break;
+  }
+  const text = clean(body.replace(/<\/(p|div|li|section|h[1-6]|br|tr)>/gi, " . ")).replace(/(\s\.)+\s/g, ". ").slice(0, maxChars);
+  return {
+    title,
+    siteName: meta(html, "og:site_name"),
+    description: meta(html, "description") || meta(html, "og:description"),
+    headings,
+    text,
+  };
+}

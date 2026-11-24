@@ -55,6 +55,14 @@ Click a button, open the file you downloaded, and follow the prompts. Other opti
 >
 > Do not click "Move to Trash". If you did, download the app again.
 
+## What's new
+
+**v1.1.0**
+- **Start from your website:** paste your address and AutoSMM fills in a first draft of your brief. It only uses what the page says.
+- A cleaner README.
+
+See [every version](CHANGELOG.md).
+
 > [!TIP]
 > The desktop app has a few extras: local models through Ollama work, "Download PDF" saves a real PDF file, and links such as "Post on LinkedIn" open in your normal browser.
 

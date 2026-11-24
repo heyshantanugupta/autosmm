@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { briefFileName, parseBriefFile, serializeBrief } from "@/lib/briefFile";
+import type { ImportedBrief } from "@/lib/importBrief";
 import { GOALS, PLATFORMS, type Goal, type Intake, type Platform } from "@/lib/types";
 
 interface Props {
@@ -9,16 +10,47 @@ interface Props {
   onChange: (next: Intake) => void;
   onSubmit: () => void;
   onStartBlank: () => void;
+  onImport: (url: string) => Promise<{ brief: ImportedBrief; demo: boolean }>;
   loading: boolean;
   error: string | null;
 }
 
-export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, loading, error }: Props) {
+export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, onImport, loading, error }: Props) {
   const set = <K extends keyof Intake>(key: K, value: Intake[K]) => onChange({ ...intake, [key]: value });
 
   const toggleChannel = (id: Platform) => {
     const has = intake.channels.includes(id);
     set("channels", has ? intake.channels.filter((c) => c !== id) : [...intake.channels, id]);
+  };
+
+  const [siteUrl, setSiteUrl] = useState(intake.website);
+  const [importing, setImporting] = useState(false);
+  const [importNote, setImportNote] = useState<{ ok: boolean; text: string; missing?: string[] } | null>(null);
+
+  // Fill only the fields that are still empty, so nothing the user typed is overwritten.
+  const importFromSite = async () => {
+    setImporting(true);
+    setImportNote(null);
+    try {
+      const { brief, demo } = await onImport(siteUrl);
+      const next = { ...intake };
+      let filled = 0;
+      for (const key of ["productName", "oneLiner", "website", "audience", "facts", "proof", "newUpdates"] as const) {
+        if (!next[key].trim() && brief[key]) {
+          next[key] = brief[key];
+          filled++;
+        }
+      }
+      onChange(next);
+      const parts = [`Filled ${filled} ${filled === 1 ? "field" : "fields"} from your website. Read each one and fix anything that is wrong before you continue.`];
+      if (demo) parts.push("Demo mode only copies the page title, description and headings. Turn it off and add a key for a fuller brief.");
+      if (brief.dropped > 0) parts.push(`${brief.dropped} ${brief.dropped === 1 ? "statement was" : "statements were"} left out because the page does not say them.`);
+      setImportNote({ ok: true, text: parts.join(" "), missing: brief.missing });
+    } catch (e) {
+      setImportNote({ ok: false, text: e instanceof Error ? e.message : "Could not read that website." });
+    } finally {
+      setImporting(false);
+    }
   };
 
   const fileRef = useRef<HTMLInputElement>(null);
@@ -61,6 +93,46 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, l
           The agent writes only from what you enter here. The more specific your facts, the better the strategy and the
           safer the drafts.
         </p>
+        <div className="field" style={{ marginTop: 14 }}>
+          <label htmlFor="site-url">Start from your website</label>
+          <p className="hint" id="site-url-hint">
+            Paste your website address and the agent fills in a first draft of the brief from what the page says. It only
+            reads the page, and nothing is saved.
+          </p>
+          <div className="row">
+            <input
+              id="site-url"
+              type="text"
+              inputMode="url"
+              placeholder="yourproduct.com"
+              aria-describedby="site-url-hint"
+              autoComplete="off"
+              spellCheck={false}
+              value={siteUrl}
+              onChange={(e) => setSiteUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (siteUrl.trim() && !importing) importFromSite();
+                }
+              }}
+              style={{ flex: "1 1 240px" }}
+            />
+            <button type="button" className="btn" onClick={importFromSite} disabled={!siteUrl.trim() || importing}>
+              {importing ? "Reading..." : "Fill in my brief"}
+            </button>
+          </div>
+          {importNote && (
+            <div className={importNote.ok ? "notice" : "error"} role={importNote.ok ? "status" : "alert"} style={{ marginTop: 8 }}>
+              {importNote.text}
+              {importNote.ok && importNote.missing && importNote.missing.length > 0 && (
+                <>
+                  {" "}Not on the page, so add these yourself if they apply: {importNote.missing.join(", ")}.
+                </>
+              )}
+            </div>
+          )}
+        </div>
         <div className="row" style={{ marginTop: 14 }}>
           <button type="button" className="btn quiet small" onClick={onStartBlank}>
             Clear the form

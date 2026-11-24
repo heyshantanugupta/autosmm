@@ -6,7 +6,7 @@ import IntakeStep from "@/components/IntakeStep";
 import PlatformStep from "@/components/PlatformStep";
 import SettingsPanel from "@/components/SettingsPanel";
 import StrategyStep from "@/components/StrategyStep";
-import { requestDrafts, requestStrategy } from "@/lib/client";
+import { requestDrafts, requestImport, requestStrategy } from "@/lib/client";
 import { getProvider } from "@/lib/providers";
 import { BLANK_INTAKE } from "@/lib/presets";
 import {
@@ -270,6 +270,7 @@ export default function Home() {
               onChange={setIntake}
               onSubmit={buildStrategy}
               onStartBlank={() => setIntake(BLANK_INTAKE)}
+              onImport={(url) => requestImport(url, settings)}
               loading={loading}
               error={error}
             />
