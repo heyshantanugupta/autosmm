@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import CalendarView from "@/components/CalendarView";
 import { ProjectIdContext } from "@/components/ProjectContext";
+import ScrollTop from "@/components/ScrollTop";
 import IntakeStep from "@/components/IntakeStep";
 import PlatformStep from "@/components/PlatformStep";
 import UpdateNotice from "@/components/UpdateNotice";
@@ -717,6 +718,7 @@ export default function Home() {
           )}
         </main>
       </div>
+      <ScrollTop />
       <footer className="footer">
         <p>
           <strong>AutoSMM</strong> was designed and built by Shantanu Gupta.

@@ -681,6 +681,11 @@ input[type="radio"] {
 .tag-need > span:first-child { font-weight: 800; }
 input.invalid, textarea.invalid { border-color: var(--danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent); }
 
+/* ---------- back to top ---------- */
+.scroll-top { position: fixed; right: 22px; bottom: 22px; z-index: 40; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); box-shadow: var(--shadow); cursor: pointer; }
+.scroll-top:hover { border-color: var(--violet); color: var(--violet-ink); }
+.scroll-top:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
 /* ---------- settings ---------- */
 
 .settings {

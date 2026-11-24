@@ -2,6 +2,10 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.8
+
+- A "Back to top" button appears in the corner once you scroll down a long page.
+
 ## v1.2.7
 
 - **Read numbers from a screenshot.** On the Results page, choose a screenshot of a post and your AI fills in the likes, comments and views. You check them before adding. It works with Gemini, ChatGPT, Claude and Grok, and the screenshot goes to your AI provider like the rest of your brief.
