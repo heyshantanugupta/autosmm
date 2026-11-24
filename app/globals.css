@@ -672,6 +672,15 @@ input[type="radio"] {
 .stamp { margin-top: 18px; display: grid; gap: 10px; justify-items: start; }
 .stamp-canvas { max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; }
 
+/* ---------- field tags ---------- */
+.label-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-bottom: 4px; }
+.label-row label { margin-bottom: 0 !important; }
+.tag { display: inline-block; font-size: 0.78rem; font-weight: 600; line-height: 1; padding: 4px 9px; border-radius: 999px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); vertical-align: middle; }
+.tag-need { color: var(--amber-ink); background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 45%, transparent); }
+.tag-ok { color: var(--teal-ink, var(--muted)); background: var(--teal-soft); border-color: transparent; }
+.tag-need > span:first-child { font-weight: 800; }
+input.invalid, textarea.invalid { border-color: var(--danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent); }
+
 /* ---------- settings ---------- */
 
 .settings {

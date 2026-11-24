@@ -7,6 +7,29 @@ import { briefStrength } from "@/lib/briefStrength";
 import type { ImportedBrief } from "@/lib/importBrief";
 import { GOALS, PLATFORMS, type Goal, type Intake, type Platform } from "@/lib/types";
 
+type Level = "required" | "recommended" | "optional";
+
+/** Tells the person at a glance whether a field must be filled in, helps a lot, or can be skipped. */
+function Tag({ level, filled }: { level: Level; filled: boolean }) {
+  if (level === "required") {
+    return filled ? (
+      <span className="tag tag-ok"><span aria-hidden="true">&#10003; </span>Done</span>
+    ) : (
+      <span className="tag tag-need"><span aria-hidden="true">! </span>Required</span>
+    );
+  }
+  return <span className="tag">{level === "recommended" ? "Recommended" : "Optional"}</span>;
+}
+
+function FieldLabel({ htmlFor, level, filled, children }: { htmlFor: string; level: Level; filled: boolean; children: React.ReactNode }) {
+  return (
+    <div className="label-row">
+      <label htmlFor={htmlFor}>{children}</label>
+      <Tag level={level} filled={filled} />
+    </div>
+  );
+}
+
 interface Props {
   intake: Intake;
   onChange: (next: Intake) => void;
@@ -83,13 +106,16 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
 
   const ready = intake.productName.trim().length > 0 && intake.facts.trim().length > 0;
   const [missingNote, setMissingNote] = useState("");
+  const [showErrors, setShowErrors] = useState(false);
   const tryBuild = () => {
     if (loading) return;
     if (ready) {
       setMissingNote("");
+      setShowErrors(false);
       onSubmit();
       return;
     }
+    setShowErrors(true);
     const noName = intake.productName.trim().length === 0;
     setMissingNote(noName ? "Add your product name first. Then add at least one fact about it." : "Add at least one fact about your product, such as what it does or who it is for. The agent only writes from the facts you give it.");
     document.getElementById(noName ? "productName" : "facts")?.focus();
@@ -189,48 +215,59 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
         <h2>The product</h2>
         <div className="grid-2">
           <div className="field">
-            <label htmlFor="productName">Product name</label>
+            <FieldLabel htmlFor="productName" level="required" filled={Boolean(intake.productName.trim())}>Product name</FieldLabel>
+            <p className="hint" id="productName-hint">What people call it.</p>
             <input
               id="productName"
               type="text"
               required
+              aria-describedby="productName-hint"
+              aria-invalid={showErrors && !intake.productName.trim()}
+              className={showErrors && !intake.productName.trim() ? "invalid" : undefined}
               value={intake.productName}
               onChange={(e) => set("productName", e.target.value)}
             />
           </div>
           <div className="field">
-            <label htmlFor="website">Website</label>
+            <FieldLabel htmlFor="website" level="optional" filled={Boolean(intake.website.trim())}>Website</FieldLabel>
+            <p className="hint" id="website-hint">Your web address, if you have one.</p>
             <input
               id="website"
               type="url"
               placeholder="https://"
+              aria-describedby="website-hint"
               value={intake.website}
               onChange={(e) => set("website", e.target.value)}
             />
           </div>
         </div>
         <div className="field">
-          <label htmlFor="oneLiner">What it does, in one sentence</label>
-          <input id="oneLiner" type="text" value={intake.oneLiner} onChange={(e) => set("oneLiner", e.target.value)} />
+          <FieldLabel htmlFor="oneLiner" level="recommended" filled={Boolean(intake.oneLiner.trim())}>What it does, in one sentence</FieldLabel>
+          <p className="hint" id="oneLiner-hint">Say it like you would to a friend. Example: a meal planner for busy parents.</p>
+          <input id="oneLiner" type="text" aria-describedby="oneLiner-hint" value={intake.oneLiner} onChange={(e) => set("oneLiner", e.target.value)} />
         </div>
         <div className="field">
-          <label htmlFor="facts">Facts the agent may use</label>
-          <p className="hint">
-            One per line. Features, limits, how it works, prices. Drafts can only make claims that appear here.
+          <FieldLabel htmlFor="facts" level="required" filled={Boolean(intake.facts.trim())}>Facts the agent may use</FieldLabel>
+          <p className="hint" id="facts-hint">
+            Things that are true about it, one per line: what it does, how it works, prices, limits. Posts can only say what is listed here.
           </p>
           <textarea
             id="facts"
             required
             rows={7}
+            aria-describedby="facts-hint"
+            aria-invalid={showErrors && !intake.facts.trim()}
+            className={showErrors && !intake.facts.trim() ? "invalid" : undefined}
             value={intake.facts}
             onChange={(e) => set("facts", e.target.value)}
-            placeholder={"Free plan: 2 practice sessions per week\nResults come with a full transcript"}
           />
         </div>
         <div className="field">
-          <label htmlFor="newUpdates">New features or news worth posting about</label>
+          <FieldLabel htmlFor="newUpdates" level="optional" filled={Boolean(intake.newUpdates.trim())}>New features or news worth posting about</FieldLabel>
+          <p className="hint" id="newUpdates-hint">Anything new you want to announce, one per line. Skip it if there is nothing new.</p>
           <textarea
             id="newUpdates"
+            aria-describedby="newUpdates-hint"
             rows={3}
             value={intake.newUpdates}
             onChange={(e) => set("newUpdates", e.target.value)}
@@ -241,12 +278,14 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
       <div className="section">
         <h2>Who and why</h2>
         <div className="field">
-          <label htmlFor="audience">Who you want to reach</label>
-          <textarea id="audience" rows={3} value={intake.audience} onChange={(e) => set("audience", e.target.value)} />
+          <FieldLabel htmlFor="audience" level="recommended" filled={Boolean(intake.audience.trim())}>Who you want to reach</FieldLabel>
+          <p className="hint" id="audience-hint">Who would use it, and what they are trying to get done.</p>
+          <textarea id="audience" aria-describedby="audience-hint" rows={3} value={intake.audience} onChange={(e) => set("audience", e.target.value)} />
         </div>
         <div className="field">
-          <label htmlFor="goal">Main goal</label>
-          <select id="goal" value={intake.goal} onChange={(e) => set("goal", e.target.value as Goal)}>
+          <FieldLabel htmlFor="goal" level="recommended" filled>Main goal</FieldLabel>
+          <p className="hint" id="goal-hint">The one thing you want the posts to do most.</p>
+          <select id="goal" aria-describedby="goal-hint" value={intake.goal} onChange={(e) => set("goal", e.target.value as Goal)}>
             {GOALS.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.label}
@@ -255,9 +294,10 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
           </select>
         </div>
         <fieldset style={{ border: 0, padding: 0, margin: "18px 0 0", minWidth: 0 }}>
-          <legend className="label" style={{ fontWeight: 600, padding: 0, marginBottom: 8 }}>
-            Channels you have
+          <legend className="label" style={{ fontWeight: 600, padding: 0, marginBottom: 4 }}>
+            <span className="label-row">Channels you have <Tag level="recommended" filled={intake.channels.length > 0} /></span>
           </legend>
+          <p className="hint">Tick the places you post, or want to start posting.</p>
           <div className="chips">
             {PLATFORMS.map((p) => (
               <label className="chip" key={p.id} data-p={p.id}>
@@ -268,10 +308,11 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
           </div>
         </fieldset>
         <div className="field">
-          <label htmlFor="currentState">Where the accounts are today</label>
-          <p className="hint">Follower counts, what has worked, what has not. Be honest: it shapes the channel advice.</p>
+          <FieldLabel htmlFor="currentState" level="optional" filled={Boolean(intake.currentState.trim())}>Where the accounts are today</FieldLabel>
+          <p className="hint" id="currentState-hint">Follower counts, what has worked, what has not. Be honest: it shapes the channel advice.</p>
           <textarea
             id="currentState"
+            aria-describedby="currentState-hint"
             rows={3}
             value={intake.currentState}
             onChange={(e) => set("currentState", e.target.value)}
@@ -282,24 +323,26 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
       <div className="section">
         <h2>Voice and guardrails</h2>
         <div className="field">
-          <label htmlFor="proof">Real proof you can use</label>
-          <p className="hint">
-            Press mentions, real numbers, real quotes with permission. One per line. Leave empty if you have none: the
-            agent will not make any up.
+          <FieldLabel htmlFor="proof" level="optional" filled={Boolean(intake.proof.trim())}>Proof that it works</FieldLabel>
+          <p className="hint" id="proof-hint">
+            Anything real that backs you up, one per line: an article or review that mentions you, a number you can
+            stand behind (like 500 users), or a customer quote you have permission to use. No proof yet? Leave it empty
+            and the agent will not make any up.
           </p>
-          <textarea id="proof" rows={3} value={intake.proof} onChange={(e) => set("proof", e.target.value)} />
+          <textarea id="proof" aria-describedby="proof-hint" rows={3} value={intake.proof} onChange={(e) => set("proof", e.target.value)} />
         </div>
         <div className="field">
-          <label htmlFor="doNotSay">Never say or do</label>
-          <p className="hint">One rule per line. Short phrases are also checked against every draft.</p>
-          <textarea id="doNotSay" rows={4} value={intake.doNotSay} onChange={(e) => set("doNotSay", e.target.value)} />
+          <FieldLabel htmlFor="doNotSay" level="optional" filled={Boolean(intake.doNotSay.trim())}>Never say or do</FieldLabel>
+          <p className="hint" id="doNotSay-hint">Words, topics or claims the posts must avoid, one per line. Short phrases are also checked against every draft.</p>
+          <textarea id="doNotSay" aria-describedby="doNotSay-hint" rows={4} value={intake.doNotSay} onChange={(e) => set("doNotSay", e.target.value)} />
         </div>
         <div className="field">
-          <label htmlFor="tone">Tone and style rules</label>
-          <input id="tone" type="text" value={intake.tone} onChange={(e) => set("tone", e.target.value)} />
+          <FieldLabel htmlFor="tone" level="optional" filled={Boolean(intake.tone.trim())}>Tone and style rules</FieldLabel>
+          <p className="hint" id="tone-hint">How you want to sound, in a few words. Example: friendly, plain, a little funny.</p>
+          <input id="tone" type="text" aria-describedby="tone-hint" value={intake.tone} onChange={(e) => set("tone", e.target.value)} />
         </div>
         <div className="field">
-          <label htmlFor="voiceSamples">Your voice (optional)</label>
+          <FieldLabel htmlFor="voiceSamples" level="optional" filled={Boolean(intake.voiceSamples.trim())}>Your voice</FieldLabel>
           <p className="hint">
             Paste 3 to 5 of your own past posts, separated by a blank line. Drafts will copy how you write. Facts in
             them are never reused.
@@ -314,35 +357,38 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
       </div>
 
       <div className="section">
-        <h2>Brand look (optional)</h2>
+        <h2>Brand look <span className="tag">Optional</span></h2>
         <p className="hint">Used in the image prompts so pictures look like your brand. Image tools cannot read your website, so say it here.</p>
         <div className="field">
-          <label htmlFor="brandColors">Brand colors</label>
+          <FieldLabel htmlFor="brandColors" level="optional" filled={Boolean(intake.brandColors.trim())}>Brand colors</FieldLabel>
+          <p className="hint" id="brandColors-hint">Your main colors, in words or color codes. Example: deep teal, warm white, coral accent.</p>
           <input
             id="brandColors"
             type="text"
-            placeholder="deep teal #0F766E, warm white, one coral accent"
+            aria-describedby="brandColors-hint"
             value={intake.brandColors}
             onChange={(e) => set("brandColors", e.target.value)}
           />
         </div>
         <div className="field">
-          <label htmlFor="visualStyle">How your pictures should look</label>
+          <FieldLabel htmlFor="visualStyle" level="optional" filled={Boolean(intake.visualStyle.trim())}>How your pictures should look</FieldLabel>
+          <p className="hint" id="visualStyle-hint">The look you want. Example: clean and simple, lots of white space, real photos of people working.</p>
           <input
             id="visualStyle"
             type="text"
-            placeholder="clean and editorial, lots of white space, real desks and hands"
+            aria-describedby="visualStyle-hint"
             value={intake.visualStyle}
             onChange={(e) => set("visualStyle", e.target.value)}
           />
         </div>
         <LogoField intake={intake} onChange={onChange} />
         <div className="field">
-          <label htmlFor="watermark">Watermark</label>
+          <FieldLabel htmlFor="watermark" level="optional" filled={Boolean(intake.watermark.trim())}>Watermark</FieldLabel>
+          <p className="hint" id="watermark-hint">Small text to put on your pictures, like your handle or web address.</p>
           <input
             id="watermark"
             type="text"
-            placeholder="@yourhandle or yourwebsite.com"
+            aria-describedby="watermark-hint"
             value={intake.watermark}
             onChange={(e) => set("watermark", e.target.value)}
           />

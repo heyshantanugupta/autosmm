@@ -2,6 +2,12 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.5
+
+- **Easier form.** Every field now has a tag: Required, Recommended or Optional. A required field that is still empty shows a "!" until you fill it, and if you press Build with one missing, it is outlined so you can find it.
+- **A short plain line under every field** says what to enter, with an example where it helps. "Proof" now explains itself: an article or review that mentions you, a number you can stand behind, or a customer quote you can use.
+- Removed the grey example text from the facts box. Examples now sit in the line under the field.
+
 ## v1.2.4
 
 - **Upload your logo.** Add it once in the Brand look section. It stays in this browser, one per project, and is never sent anywhere. Brand colors are filled in from it if you left them empty.

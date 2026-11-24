@@ -63,7 +63,10 @@ export default function LogoField({ intake, onChange }: Props) {
 
   return (
     <div className="field logo-field">
-      <label htmlFor="logoFile">Logo</label>
+      <div className="label-row">
+        <label htmlFor="logoFile">Logo</label>
+        <span className="tag">Optional</span>
+      </div>
       <p className="hint">
         Upload it once. It stays in this browser only and is never sent anywhere. Image tools cannot draw your logo
         correctly, so on each post you add it to the picture afterwards.
@@ -93,10 +96,11 @@ export default function LogoField({ intake, onChange }: Props) {
         </p>
       )}
       <label htmlFor="logoNote" className="logo-note-label">Where it goes, and what it looks like</label>
+      <p className="hint" id="logoNote-hint">Example: bottom-right corner, a white wordmark with a round teal icon.</p>
       <input
         id="logoNote"
         type="text"
-        placeholder="bottom-right, white wordmark with a round teal icon"
+        aria-describedby="logoNote-hint"
         value={intake.logoNote}
         onChange={(e) => onChange({ ...intake, logoNote: e.target.value })}
       />
