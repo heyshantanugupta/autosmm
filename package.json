@@ -71,13 +71,13 @@
             "x64"
           ]
         }
-      ],
-      "artifactName": "AutoSMM-${version}-windows-${arch}.${ext}"
+      ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "perMachine": false
+      "perMachine": false,
+      "artifactName": "AutoSMM-Setup-windows-${arch}.${ext}"
     },
     "mac": {
       "category": "public.app-category.business",
@@ -85,7 +85,7 @@
         "dmg",
         "zip"
       ],
-      "artifactName": "AutoSMM-${version}-mac-${arch}.${ext}",
+      "artifactName": "AutoSMM-mac-${arch}.${ext}",
       "identity": "-"
     },
     "linux": {
@@ -96,7 +96,10 @@
       "artifactName": "AutoSMM-${version}-linux-${arch}.${ext}",
       "executableName": "autosmm"
     },
-    "afterPack": "scripts/after-pack.cjs"
+    "afterPack": "scripts/after-pack.cjs",
+    "portable": {
+      "artifactName": "AutoSMM-Portable-windows-${arch}.${ext}"
+    }
   },
   "allowScripts": {
     "electron": true

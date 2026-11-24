@@ -27,13 +27,19 @@ Describe your product once. Get a social media strategy, then ready-to-edit post
 
 No Node.js, no terminal and no setup. AutoSMM is a normal desktop app, and everything stays on your own computer, saved work included.
 
-Open the [Releases page](https://github.com/heyshantanugupta/autosmm/releases) and download the file for your computer, then double-click it.
+<p align="center">
+  <a href="https://github.com/heyshantanugupta/autosmm/releases/latest/download/AutoSMM-Setup-windows-x64.exe"><img alt="Download for Windows" src="https://img.shields.io/badge/Download%20for-Windows-5b47f5?style=for-the-badge"></a>
+  &nbsp;
+  <a href="https://github.com/heyshantanugupta/autosmm/releases/latest/download/AutoSMM-mac-arm64.dmg"><img alt="Download for Mac, Apple chip" src="https://img.shields.io/badge/Download%20for-Mac%20(Apple%20chip)-12b5a2?style=for-the-badge"></a>
+  &nbsp;
+  <a href="https://github.com/heyshantanugupta/autosmm/releases/latest/download/AutoSMM-mac-x64.dmg"><img alt="Download for Mac, Intel chip" src="https://img.shields.io/badge/Download%20for-Mac%20(Intel%20chip)-e5407e?style=for-the-badge"></a>
+</p>
 
-| Computer | Download |
-|---|---|
-| Windows | `AutoSMM-<version>-windows-x64.exe` (installer) or the file ending in `portable.exe` (runs without installing) |
-| Mac with Apple chip (M1 or newer) | `AutoSMM-<version>-mac-arm64.dmg` |
-| Mac with Intel chip | `AutoSMM-<version>-mac-x64.dmg` |
+Click a button, open the file you downloaded, and follow the prompts. Other options:
+
+- **Windows without installing:** [AutoSMM-Portable-windows-x64.exe](https://github.com/heyshantanugupta/autosmm/releases/latest/download/AutoSMM-Portable-windows-x64.exe) runs straight from wherever you save it.
+- **Not sure which Mac you have?** Open the Apple menu and choose About This Mac. If it says "Chip: Apple M1" (or M2, M3 and so on), use Apple chip. If it says "Intel", use Intel.
+- **All versions:** see the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
 > [!WARNING]
 > The apps are not code signed yet, so the first launch shows a warning. This is expected.
