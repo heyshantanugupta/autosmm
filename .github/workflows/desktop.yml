@@ -30,6 +30,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      # The installer file names carry the release version, so set it before building.
+      - name: Set app version from the release name
+        shell: bash
+        env:
+          TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+        run: npm version "${TAG#v}" --no-git-tag-version --allow-same-version
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -62,3 +68,22 @@ jobs:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
           files: dist/*
           generate_release_notes: true
+
+  # Point the README download buttons at the files of the release that was just published.
+  readme:
+    needs: release
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Update download links
+        run: |
+          export VERSION="${TAG#v}"
+          perl -pi -e 's{releases/(?:latest/download|download/[^/]+)/}{releases/download/$ENV{TAG}/}g; s{AutoSMM-Setup-(?:[\d.]+-)?windows-}{AutoSMM-Setup-$ENV{VERSION}-windows-}g; s{AutoSMM-Portable-(?:[\d.]+-)?windows-}{AutoSMM-Portable-$ENV{VERSION}-windows-}g; s{AutoSMM-(?:[\d.]+-)?mac-}{AutoSMM-$ENV{VERSION}-mac-}g' README.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git diff --cached --quiet || (git commit -m "Point download buttons at $TAG" && git push origin HEAD:main)

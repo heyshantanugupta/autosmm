@@ -77,7 +77,7 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "perMachine": false,
-      "artifactName": "AutoSMM-Setup-windows-${arch}.${ext}"
+      "artifactName": "AutoSMM-Setup-${version}-windows-${arch}.${ext}"
     },
     "mac": {
       "category": "public.app-category.business",
@@ -85,7 +85,7 @@
         "dmg",
         "zip"
       ],
-      "artifactName": "AutoSMM-mac-${arch}.${ext}",
+      "artifactName": "AutoSMM-${version}-mac-${arch}.${ext}",
       "identity": "-"
     },
     "linux": {
@@ -98,7 +98,7 @@
     },
     "afterPack": "scripts/after-pack.cjs",
     "portable": {
-      "artifactName": "AutoSMM-Portable-windows-${arch}.${ext}"
+      "artifactName": "AutoSMM-Portable-${version}-windows-${arch}.${ext}"
     }
   },
   "allowScripts": {
