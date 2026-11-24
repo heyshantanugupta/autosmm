@@ -117,6 +117,11 @@ export function saveWorkspace(w: Workspace) {
   write(window.localStorage, WORKSPACE_KEY, JSON.stringify(w));
 }
 
+export function removeWorkspace() {
+  if (typeof window === "undefined") return;
+  remove(window.localStorage, WORKSPACE_KEY);
+}
+
 export function clearAllStoredData() {
   if (typeof window === "undefined") return;
   remove(window.localStorage, WORKSPACE_KEY);

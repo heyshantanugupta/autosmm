@@ -22,6 +22,7 @@ import {
   clearAllStoredData,
   loadSettings,
   loadWorkspace,
+  removeWorkspace,
   saveSettings,
   saveWorkspace,
   type Settings,
@@ -345,6 +346,20 @@ export default function Home() {
     setError(null);
   };
 
+  /** Clear the saved work but keep the API key and settings. */
+  const startNew = () => {
+    setIntake(BLANK_INTAKE);
+    setStrategy(null);
+    setDrafts([]);
+    setPlan([]);
+    setResults([]);
+    setReview(null);
+    setPlanTab("brief");
+    setError(null);
+    removeWorkspace();
+    setTab("plan");
+  };
+
   const act = (action: NextAction) => {
     switch (action) {
       case "brief":
@@ -443,6 +458,7 @@ export default function Home() {
               error={error}
               onAct={act}
               onGo={(t) => goTab(t)}
+              onStartNew={startNew}
             />
           )}
 

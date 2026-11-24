@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import PlanRow from "./PlanRow";
-import { formatDay } from "@/lib/dates";
+import { formatDayLong } from "@/lib/dates";
 import { greeting } from "@/lib/greeting";
 import { nextStep, weekAhead, type NextAction, type Snapshot } from "@/lib/nextStep";
 
@@ -12,15 +13,18 @@ interface Props {
   error: string | null;
   onAct: (action: NextAction) => void;
   onGo: (tab: "reply" | "plan" | "results") => void;
+  onStartNew: () => void;
 }
 
-export default function TodayView({ snapshot, loading, progress, error, onAct, onGo }: Props) {
+export default function TodayView({ snapshot, loading, progress, error, onAct, onGo, onStartNew }: Props) {
+  const [confirming, setConfirming] = useState(false);
   const step = nextStep(snapshot);
   const week = weekAhead(snapshot.plan, snapshot.today);
   const themeName = (id: string) => snapshot.strategy?.themes.find((t) => t.id === id)?.name ?? "";
   const first = snapshot.plan.length === 0;
   const hello = snapshot.today ? greeting(new Date().getHours()) : "Hello";
   const name = snapshot.intake.productName.trim();
+  const hasWork = Boolean(name || snapshot.strategy);
   const tiles = [
     { n: week.length, label: "planned this week" },
     { n: week.filter((i) => i.draftId).length, label: "written" },
@@ -33,20 +37,48 @@ export default function TodayView({ snapshot, loading, progress, error, onAct, o
       <div>
         <h1>{hello}.</h1>
         <p className="lede">
-          {snapshot.today ? `${formatDay(snapshot.today)}. ` : ""}
-          {name ? `Here is what is next for ${name}.` : "Let us get your social media moving."}
+          {snapshot.today ? `Today is ${formatDayLong(snapshot.today)}. ` : ""}
+          {hasWork ? `Welcome back. Your work is saved on this computer.` : "Let us get your social media moving."}
         </p>
       </div>
 
       <section className="next-card" aria-labelledby="next-title">
-        <p className="next-kicker">{first ? "Start here" : "Your next step"}</p>
+        <p className="next-kicker">{hasWork ? "Pick up where you left off" : "Start here"}</p>
         <h2 id="next-title">{step.title}</h2>
         <p>{step.text}</p>
         <div className="row">
           <button type="button" className="btn" onClick={() => onAct(step.action)} disabled={loading}>
             {loading ? progress ?? "Working..." : step.button}
           </button>
+          {hasWork && (
+            <button type="button" className="btn secondary" onClick={() => setConfirming(true)} disabled={loading}>
+              Start something new
+            </button>
+          )}
         </div>
+        {confirming && (
+          <div className="notice warn" role="alertdialog" aria-label="Start something new">
+            <p>
+              This clears your brief, strategy, plan, drafts and results from this computer. To keep your brief, save it
+              first with "Save brief" on the Plan tab. Your API key and settings stay.
+            </p>
+            <div className="row">
+              <button
+                type="button"
+                className="btn small"
+                onClick={() => {
+                  setConfirming(false);
+                  onStartNew();
+                }}
+              >
+                Yes, start new
+              </button>
+              <button type="button" className="btn quiet small" onClick={() => setConfirming(false)}>
+                Keep my work
+              </button>
+            </div>
+          </div>
+        )}
         {error && <p className="error" role="alert">{error}</p>}
       </section>
 
