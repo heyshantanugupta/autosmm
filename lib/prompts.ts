@@ -492,3 +492,31 @@ export const HASHTAG_TOOL = {
 export function ideasUserPrompt(intake: Intake, topic: string, platforms: string[]): string {
   return [formatIntake(intake), `\nTOPIC OR POST TEXT:\n"""\n${topic}\n"""`, platforms.length ? `\nPLATFORMS: ${platforms.join(", ")}` : ""].filter(Boolean).join("\n");
 }
+
+export const METRICS_SYSTEM = `You read the engagement numbers shown on a screenshot of one social media post.
+
+Rules:
+- Report only numbers that are clearly visible on the post itself. If a number is not shown, return null for it. Never guess or estimate.
+- likes: the like or reaction count. comments: the comment or reply count. views: the view, play or impression count.
+- Do not use follower counts, subscriber counts, share counts or numbers from other posts or ads.
+- Turn short forms into whole numbers (1.2K is 1200, 3M is 3000000). If you did that, say in "note" that the number is rounded on screen.
+- If the screenshot is not a social media post, or is too blurry to read, return null for all three and explain in "note".`;
+
+export const METRICS_TOOL = {
+  name: "submit_metrics",
+  description: "Submit the likes, comments and views read from the screenshot.",
+  schema: {
+    type: "object",
+    properties: {
+      likes: { type: ["number", "null"], description: "Likes or reactions, or null if not shown." },
+      comments: { type: ["number", "null"], description: "Comments or replies, or null if not shown." },
+      views: { type: ["number", "null"], description: "Views, plays or impressions, or null if not shown." },
+      note: { type: "string", description: "One short sentence about anything to double check, or empty." },
+    },
+    required: ["likes", "comments", "views", "note"],
+  },
+} as const;
+
+export function metricsUserPrompt(platform: string): string {
+  return `Read the likes, comments and views from this screenshot${platform ? ` of a ${platform} post` : ""}.`;
+}

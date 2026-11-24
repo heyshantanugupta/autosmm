@@ -2,6 +2,24 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.9
+
+- **UI Scale.** Settings has a UI Scale choice (80% to 120%). The app now starts a little smaller at 90%.
+- Settings has quick buttons that jump to Model, Version and UI Scale.
+- **Write tab.** After the next 7 days, "Show whole plan" lists every planned post, and the list switches to the whole plan on its own when nothing is due this week. "Write a different post" is now "Write my own post", and its page has "Back to my drafts".
+
+- The side menu now stays at the left edge on full screen instead of floating in the middle.
+- Settings now has a Projects section (switch, new, rename, duplicate, export, import, delete).
+
+## v1.2.8
+
+- A "Back to top" button appears in the corner once you scroll down a long page.
+
+## v1.2.7
+
+- **Read numbers from a screenshot.** On the Results page, choose a screenshot of a post and your AI fills in the likes, comments and views. You check them before adding. It works with Gemini, ChatGPT, Claude and Grok, and the screenshot goes to your AI provider like the rest of your brief.
+- Results explains why there is no link field: most platforms keep post numbers behind a login, so reading a link would be unreliable, could break at any time and may go against the platform's rules.
+
 ## v1.2.6
 
 - The version you have installed now shows at the bottom of Settings.

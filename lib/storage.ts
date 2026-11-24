@@ -11,7 +11,11 @@ export interface Settings {
   model: string;
   /** Demo mode skips the API and returns template output. */
   demo: boolean;
+  /** Text and layout scale in percent, 80 to 120. */
+  uiScale: number;
 }
+
+export const UI_SCALES = [80, 90, 100, 110, 120];
 
 export const DEFAULT_SETTINGS: Settings = {
   provider: DEFAULT_PROVIDER,
@@ -19,6 +23,7 @@ export const DEFAULT_SETTINGS: Settings = {
   remember: false,
   model: getProvider(DEFAULT_PROVIDER).defaultModel,
   demo: false,
+  uiScale: 90,
 };
 
 const PREFS_KEY = "ssa.prefs";
@@ -64,12 +69,13 @@ export function loadSettings(): Settings {
     remember: Boolean(prefs.remember),
     model: prefs.model ?? provider.defaultModel,
     demo: Boolean(prefs.demo),
+    uiScale: UI_SCALES.includes(Number(prefs.uiScale)) ? Number(prefs.uiScale) : DEFAULT_SETTINGS.uiScale,
   };
 }
 
 export function saveSettings(s: Settings) {
   if (typeof window === "undefined") return;
-  const prefs: Partial<Settings> = { provider: s.provider, remember: s.remember, model: s.model, demo: s.demo };
+  const prefs: Partial<Settings> = { provider: s.provider, remember: s.remember, model: s.model, demo: s.demo, uiScale: s.uiScale };
   if (s.remember) {
     prefs.apiKey = s.apiKey;
     remove(window.sessionStorage, SESSION_KEY);

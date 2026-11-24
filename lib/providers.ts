@@ -25,6 +25,8 @@ export interface Provider {
   needsKey: boolean;
   /** Anthropic uses its own SDK. Everything else speaks the OpenAI-compatible chat API. */
   kind: "anthropic" | "openai-compatible";
+  /** The default models can read pictures. Used for reading numbers off a screenshot. */
+  vision?: boolean;
   defaultModel: string;
   /** Suggested models. Non-Anthropic providers also accept any model id typed by the user. */
   models: { id: string; label: string }[];
@@ -42,6 +44,7 @@ export const PROVIDERS: Provider[] = [
     keyPlaceholder: "AIza...",
     needsKey: true,
     kind: "openai-compatible",
+    vision: true,
     defaultModel: "gemini-3.5-flash-lite",
     models: [
       { id: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash-Lite (fastest)" },
@@ -86,6 +89,7 @@ export const PROVIDERS: Provider[] = [
     keyPlaceholder: "sk-...",
     needsKey: true,
     kind: "openai-compatible",
+    vision: true,
     defaultModel: "gpt-5-mini",
     models: [
       { id: "gpt-5-mini", label: "GPT-5 mini (cheaper)" },
@@ -102,6 +106,7 @@ export const PROVIDERS: Provider[] = [
     keyPlaceholder: "xai-...",
     needsKey: true,
     kind: "openai-compatible",
+    vision: true,
     defaultModel: "grok-4.7",
     models: [{ id: "grok-4.7", label: "Grok 4.7 (default)" }],
   },
@@ -114,6 +119,7 @@ export const PROVIDERS: Provider[] = [
     keyPlaceholder: "sk-ant-...",
     needsKey: true,
     kind: "anthropic",
+    vision: true,
     defaultModel: "claude-sonnet-5-5",
     models: [
       { id: "claude-sonnet-5-5", label: "Claude Sonnet 5.5 (balanced)" },

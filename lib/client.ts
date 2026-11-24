@@ -1,5 +1,6 @@
 import type { Settings } from "./storage";
 import type { ImportedBrief } from "./importBrief";
+import type { ReadMetrics } from "./metrics";
 import type { Summary } from "./results";
 import type { Draft, Intake, Platform, PlanItem, ResultEntry, Review, Strategy } from "./types";
 
@@ -65,6 +66,10 @@ export interface ReplyResult {
 
 export function requestReply(args: { intake: Intake; message: string; platform?: Platform; kind?: "message" | "review" }, settings: Settings) {
   return post<ReplyResult>("/api/reply", args, settings);
+}
+
+export function requestMetrics(args: { image: string; platform?: Platform }, settings: Settings) {
+  return post<{ metrics: ReadMetrics }>("/api/metrics", args, settings);
 }
 
 export function requestReview(args: { intake: Intake; strategy: Strategy; entries: ResultEntry[] }, settings: Settings) {

@@ -39,7 +39,11 @@ type Section = "week" | "repurpose" | "hooks" | "hashtags";
 
 export default function WriteView(p: Props) {
   const [section, setSection] = useState<Section>("week");
+  const [range, setRange] = useState<"week" | "all">("week");
   const week = weekAhead(p.plan, p.today);
+  // After the 7 days run out, the whole plan is still reachable here.
+  const shown = range === "all" || week.length === 0 ? p.plan : week;
+  const wholePlan = shown === p.plan;
   const unwritten = week.filter((i) => !i.draftId);
   const themeName = (id: string) => p.strategy.themes.find((t) => t.id === id)?.name ?? "";
 
@@ -50,7 +54,7 @@ export default function WriteView(p: Props) {
         <p className="lede">
           {p.plan.length === 0
             ? "Make your 30-day plan first, and AutoSMM can write a week of posts in one go. Or write a single post below."
-            : "Your next 7 days. Write them all at once, then edit each one and post it yourself. Nothing is posted for you."}
+            : "Write from your 30-day plan, or write your own post any time. Edit each one and post it yourself. Nothing is posted for you."}
         </p>
       </div>
 
@@ -83,22 +87,26 @@ export default function WriteView(p: Props) {
       ) : (
         <section aria-labelledby="week-title">
           <h2 className="group-title" id="week-title">
-            Next 7 days
+            {wholePlan ? "Your whole plan" : "Next 7 days"}
           </h2>
-          {week.length === 0 ? (
-            <p className="notice">Nothing is planned for the next 7 days. Make a new plan on the Plan tab.</p>
-          ) : (
+          {week.length === 0 && <p className="notice">Nothing is planned for the next 7 days, so the whole plan is shown. You can make a new plan on the Plan tab.</p>}
+          {
             <>
               <div className="row">
                 <button type="button" className="btn" disabled={p.loading || unwritten.length === 0} onClick={p.onWriteWeek}>
                   {p.loading && p.progress ? p.progress : unwritten.length === 0 ? "All written" : `Write ${unwritten.length === week.length ? "this week" : `the other ${unwritten.length}`}`}
                 </button>
                 <button type="button" className="btn secondary" onClick={p.onAddMore} disabled={p.loading}>
-                  Write a different post
+                  Write my own post
                 </button>
+                {week.length > 0 && (
+                  <button type="button" className="btn quiet" onClick={() => setRange(wholePlan ? "week" : "all")}>
+                    {wholePlan ? "Show next 7 days" : `Show whole plan (${p.plan.length})`}
+                  </button>
+                )}
               </div>
               <ul className="plan-list">
-                {week.map((it) => (
+                {shown.map((it) => (
                   <PlanRow
                     key={it.id}
                     item={it}
@@ -132,7 +140,7 @@ export default function WriteView(p: Props) {
                 ))}
               </ul>
             </>
-          )}
+          }
           {p.error && <p className="error" role="alert">{p.error}</p>}
         </section>
       ))}
