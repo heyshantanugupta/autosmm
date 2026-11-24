@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import CalendarView from "@/components/CalendarView";
 import IntakeStep from "@/components/IntakeStep";
 import PlatformStep from "@/components/PlatformStep";
+import UpdateNotice from "@/components/UpdateNotice";
 import ProjectMenu from "@/components/ProjectMenu";
 import ReplyView from "@/components/ReplyView";
 import ResultsView from "@/components/ResultsView";
@@ -537,6 +538,7 @@ export default function Home() {
         </nav>
 
         <main className="stage">
+          <UpdateNotice />
           {showSettings && (
             <SettingsPanel
               settings={settings}

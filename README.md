@@ -72,6 +72,7 @@ You also get strategy, a 30-day plan, a reply helper, a results review and proje
 ## What's new
 
 **v1.2.1**
+- **Update notice** in the desktop app when a newer version is out.
 - **Start from your website** works on more sites, and **Build strategy** now tells you what is missing.
 
 **v1.2.0**

@@ -4,6 +4,7 @@ The newest version is first. Each version here matches a release on the [Release
 
 ## v1.2.1
 
+- **Update notice.** The desktop app now checks GitHub once a day and shows a small banner when a newer version is out, with a link to download it. It never installs anything by itself, and you can dismiss it.
 - Start from your website now works on more sites: it retries the way a browser asks when a site refuses it, reads sites that build their text with JavaScript, and says plainly when a site blocks it.
 - Build strategy no longer sits silently greyed out or shows a hidden tooltip. If the name or a fact is missing, it says what to add and jumps to that field.
 

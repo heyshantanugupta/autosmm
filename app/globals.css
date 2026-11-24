@@ -1626,3 +1626,8 @@ fieldset.field > legend { padding: 0; margin-bottom: 10px; font-weight: 600; }
 }
 
 .pmark svg { width: 56%; height: 56%; display: block; }
+
+.update-notice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; padding: 14px 18px; }
+.update-actions { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.update-actions a { color: var(--violet-ink); font-weight: 600; }
+.update-actions a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
