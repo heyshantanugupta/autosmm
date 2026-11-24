@@ -4,6 +4,7 @@ The newest version is first. Each version here matches a release on the [Release
 
 ## v1.2.1
 
+- **Better image prompts.** The prompt you paste into Gemini or ChatGPT is now laid out in clear lines: subject, composition for that platform, style, light and color, format, and what to avoid. A draft that only says "use a real screenshot" now becomes a scene that leaves room for your own screenshot.
 - **Smaller and lighter.** The app's server files shrank from about 70 MB to about 23 MB, the installer carries English only, and the app's background process is capped in memory so older computers with little RAM cope better.
 - **Update notice.** The desktop app now checks GitHub once a day and shows a small banner when a newer version is out, with a link to download it. It never installs anything by itself, and you can dismiss it.
 - Start from your website now works on more sites: it retries the way a browser asks when a site refuses it, reads sites that build their text with JavaScript, and says plainly when a site blocks it.

@@ -126,7 +126,7 @@ How to write the drafts:
 - In "claimsUsed", list every factual claim the post relies on, copied closely from the user's facts so it can be verified. If the post makes no factual claims, return an empty list.
 - linkSlug: a short lowercase slug the team can use for a tracked link (for example "li-founder-story"). Platform prefix first.
 - bestTime: a practical suggestion and the reason, kept to one short line. It is a suggestion, not a guarantee.
-- visualIdea: what image, screenshot or video would go with the post. Real product screens only. No stock-photo ideas.
+- visualIdea: one concrete sentence on the picture that goes with the post: the subject, where it is, and what is in frame. Say "a real screenshot of <the actual screen>" only when the post shows a real product screen. No stock-photo ideas.
 - For multi-part formats (threads, carousels, scripts, story sequences) put the whole structure in "body", with clear labels such as "Slide 1:" or "Post 2/6:".
 - If the post type is a Reddit post, do not put a link in the body.`;
 

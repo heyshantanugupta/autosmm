@@ -11,29 +11,107 @@ const SHAPE: Record<Platform, { ratio: string; note: string }> = {
   reddit: { ratio: "16:9 landscape (1600 x 900)", note: "an image for a Reddit post" },
 };
 
+type Kind = "story" | "product" | "data" | "opinion" | "teach" | "quote" | "default";
+
+/** Picks a look from the post type, so the picture matches what the post is doing. */
+function kindOf(draft: Draft): Kind {
+  const key = `${draft.postTypeId} ${draft.postTypeLabel}`.toLowerCase();
+  if (/quote/.test(key)) return "quote";
+  if (/story|founder|customer/.test(key)) return "story";
+  if (/demo|feature|announce|launch|product|build-in-public|update/.test(key)) return "product";
+  if (/data|insight|proof|result/.test(key)) return "data";
+  if (/myth|hot-take|opinion|poll|question/.test(key)) return "opinion";
+  if (/how-to|tip|carousel|teach|educat/.test(key)) return "teach";
+  return "default";
+}
+
+/** Concrete look, light and subject for each kind of post. Image tools do best with specific, visual words. */
+const LOOK: Record<Kind, { style: string; light: string; subject: string }> = {
+  story: {
+    style: "editorial lifestyle photograph, shot on a 35mm lens, natural and candid",
+    light: "soft window light, warm tones, shallow depth of field",
+    subject: "a real-feeling moment shown through hands, objects and a workspace, with no faces visible",
+  },
+  product: {
+    style: "clean product-in-context illustration, modern flat design with subtle depth",
+    light: "even, bright studio light, gentle shadows",
+    subject: "a laptop or phone on a tidy desk showing a blurred, unreadable app screen, so a real screenshot can be placed over it later",
+  },
+  data: {
+    style: "minimal abstract data illustration, flat vector shapes",
+    light: "flat, even light",
+    subject: "simple bars, lines or dots rising or connecting, with no numbers, labels or axes",
+  },
+  opinion: {
+    style: "bold minimal graphic metaphor, flat vector, strong shapes",
+    light: "flat, high contrast",
+    subject: "one clear visual metaphor for the idea, drawn with a few simple shapes",
+  },
+  teach: {
+    style: "clear explanatory illustration, flat vector, friendly and uncluttered",
+    light: "flat, even light",
+    subject: "one simple scene or object that stands for the single idea being taught",
+  },
+  quote: {
+    style: "calm abstract background, soft gradient or paper texture",
+    light: "flat, even light",
+    subject: "a plain textured field with a large empty area in the middle, where the quote will be added later",
+  },
+  default: {
+    style: "clean modern illustration, flat vector, uncluttered",
+    light: "soft, even light",
+    subject: "one clear object or scene that supports the post",
+  },
+};
+
+/** Where to keep the picture clear, so the platform's own buttons and the person's text overlay do not cover the subject. */
+const SAFE: Record<Platform, string> = {
+  linkedin: "Place the subject on the left or right third. Keep the other two thirds calm and empty, for a headline added later.",
+  x: "Center the subject. Keep a small empty margin on every side, because the feed crops the edges.",
+  facebook: "Place the subject slightly left of center. Keep the right side calm and empty.",
+  instagram: "Place the subject in the upper two thirds. Keep the bottom third calm and empty, for a caption overlay.",
+  tiktok: "Keep the top 15% and bottom 25% empty, because the app covers them with buttons and captions. Put the subject in the middle.",
+  youtube: "Use one large, bold subject on the left. Keep the right third empty and the contrast high, so it reads at thumbnail size.",
+  reddit: "Center one clear subject with a simple background, so it reads in a small preview.",
+};
+
+const clip = (s: string, n: number) => s.replace(/\s+/g, " ").trim().slice(0, n);
+
+/** A visual idea that only says "use a real screenshot" cannot be drawn by an image tool. */
+const wantsRealScreen = (s: string) => /\b(screenshot|screen recording|screen capture|screen|recording|video|demo)\b/i.test(s);
+
 /**
- * A ready-to-paste prompt for any image generator. Built from the draft's own visual idea, so it
- * needs no extra model call. It asks for no text in the picture, because image models misspell
- * words and invent numbers; the person adds real text afterwards.
+ * A ready-to-paste prompt for any image generator. Built from the draft and the brief, so it needs no
+ * extra model call. It is laid out in labeled lines (subject, composition, style, light, format, avoid)
+ * because image tools follow specific, concrete direction better than a loose idea. It asks for no text
+ * in the picture, because image models misspell words and invent numbers; the person adds real text afterwards.
  */
 export function buildImagePrompt(draft: Draft, intake: Intake): string {
   const shape = SHAPE[draft.platform];
-  const idea =
-    draft.visualIdea.trim() ||
-    `A simple, clear picture that supports this post: ${draft.hook || draft.body.slice(0, 140)}`;
+  const look = LOOK[kindOf(draft)];
+  const name = intake.productName.trim() || "a product";
+  const what = clip(intake.oneLiner || "", 160).replace(/[.\s]+$/, "");
+  const about = clip(draft.hook || draft.body, 140);
+  const idea = clip(draft.visualIdea || "", 220);
+
+  // Use the post's own visual idea when it is a scene an image tool can draw. A "real screenshot" idea
+  // is replaced by a scene that leaves room for the real one.
+  const subject = idea && !wantsRealScreen(idea) ? `${idea}${/[.!?]$/.test(idea) ? "" : "."}` : `${look.subject}.`;
+
   const lines = [
-    `Create ${shape.note} for ${intake.productName || "a product"}.`,
+    `Create ${shape.note} for ${name}${what ? ` (${what})` : ""}.`,
+    about ? `The post it goes with is about: "${about}"` : "",
+    intake.audience.trim() ? `The viewers are: ${clip(intake.audience, 160)}.` : "",
     "",
-    `Scene: ${idea.replace(/\s+/g, " ")}`,
-    draft.themeId ? `Mood: ${draft.postTypeLabel.toLowerCase()} post, calm and credible.` : "",
-    intake.audience ? `Audience: ${intake.audience.replace(/\s+/g, " ").slice(0, 200)}` : "",
+    `Subject: ${subject}`,
+    `Composition: ${SAFE[draft.platform]} One clear focal point, simple background, plenty of empty space.`,
+    `Style: ${look.style}.`,
+    `Light and color: ${look.light}. A calm palette of two or three harmonious colors plus one accent. No neon.`,
+    `Format: ${shape.ratio}.`,
     "",
-    `Size: ${shape.ratio}.`,
-    "Style: clean, modern, lots of empty space, soft colors, one clear focal point.",
-    "Do not include any text, letters, numbers, logos or watermarks in the image.",
-    "Do not show real people's faces or invented screenshots with fake data.",
+    "Avoid: any text, letters, numbers, logos or watermarks; real people's faces; invented screenshots with fake data; clutter; distorted hands.",
   ];
-  return lines.filter((l, i) => l !== "" || lines[i - 1] !== "").join("\n").trim();
+  return lines.filter((l, i) => l !== "" || (i > 0 && lines[i - 1] !== "")).join("\n").trim();
 }
 
 export interface ImageTool {
