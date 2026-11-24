@@ -4,34 +4,42 @@ Your Social Media Marketing Solution. Enter your product details. The app propos
 
 **It never posts for you.** No auto-posting, no automated connection requests, no automated replies. You copy the draft and publish it.
 
+## Download the app (Windows and Mac)
+
+No Node.js, no terminal and no setup. AutoSMM is a normal desktop app, and everything stays on your own computer, saved work included.
+
+Open the [Releases page](https://github.com/heyshantanugupta/autosmm/releases) and download the file for your computer, then double-click it.
+
+| Computer | Download |
+|---|---|
+| Windows | `AutoSMM-<version>-windows-x64.exe` (installer) or the file ending in `portable.exe` (runs without installing) |
+| Mac with Apple chip (M1 or newer) | `AutoSMM-<version>-mac-arm64.dmg` |
+| Mac with Intel chip | `AutoSMM-<version>-mac-x64.dmg` |
+
+The apps are not code signed yet, so the first launch shows a warning:
+
+- **Windows:** choose "More info", then "Run anyway".
+- **Mac:** drag AutoSMM to Applications, then right-click it and choose Open the first time. If macOS says the app is damaged, run `xattr -cr /Applications/AutoSMM.app` in Terminal once.
+
+Desktop extras: local models through Ollama work, "Download PDF" saves a real PDF file, and links such as "Post on LinkedIn" open in your normal browser.
+
+## Choose how it writes
+
+Open Settings inside the app and pick one:
+
+- **Free:** Google Gemini, Groq or OpenRouter free models. Create a free key, paste it in Settings, done. Free tiers have rate limits.
+- **Local and free:** Ollama, running on your own computer (works in the desktop app and when you run from source).
+- **Paid:** Anthropic Claude (best quality) or OpenAI ChatGPT. Both need an API key, which is billed separately from any chat subscription.
+- **No key at all:** demo mode. It uses templates, not a model, so you can try the flow.
+
+Free-tier terms and model names change, and providers retire models. If you see "model not available", open Settings, paste your key and click **Check available models** to list what your key can use, then pick one.
+
 ## What it does
 
 1. **Brief**: product, facts, audience, goal, channels, real proof, things never to say, tone.
 2. **Strategy**: positioning, audiences, content themes, platform roles, weekly rhythm, how to measure, risks, and gaps in your brief.
 3. **Platform and post types**: LinkedIn, Instagram, X, Facebook, YouTube, TikTok, Reddit, each with post types that fit its norms.
 4. **Drafts**: editable text with a character counter, copy button, "rewrite this draft" with an instruction, and Markdown export.
-
-## Run it locally
-
-You need [Node.js](https://nodejs.org) 20 or newer.
-
-```bash
-npm install
-npm run dev
-```
-
-Open http://localhost:3000.
-
-Pick how it generates text in Settings:
-
-- **Free:** Google Gemini, Groq or OpenRouter free models. Create a free key, paste it in Settings, done. Free tiers have rate limits.
-- **Local and free:** Ollama, running on your own computer (works only when you run this app locally).
-- **Paid, best quality:** Anthropic Claude.
-- **No key at all:** demo mode. It uses templates, not a model, so you can try the flow.
-
-Free-tier terms and model names change, and providers retire models. If you see "model not available", open Settings, paste your key and click **Check available models** to list what your key can use, then pick one.
-
-Other commands: `npm test`, `npm run typecheck`, `npm run build`, `npm start`.
 
 ## Bring your own key
 
@@ -64,32 +72,6 @@ Flags appear in the margin next to the draft. They are warnings, not blocks: you
 - **Download the strategy.** The strategy page can export the report as a PDF (choose Save as PDF in the print window) or as a Word (.docx) file.
 - **OpenAI.** Choose OpenAI ChatGPT in Settings and paste an OpenAI API key. A ChatGPT subscription is billed separately and does not include API access.
 
-## Desktop app (Windows and Mac)
-
-AutoSMM also runs as a normal desktop app, so nobody needs Node.js or a hosted website. Everything stays on the person's own computer, saved work included.
-
-**For users:** open the Releases page of the repository and download the file for your computer.
-
-| Computer | Download |
-|---|---|
-| Windows | `AutoSMM-<version>-windows-x64.exe` (installer) or the file ending in `portable.exe` (runs without installing) |
-| Mac with Apple chip (M1 or newer) | `AutoSMM-<version>-mac-arm64.dmg` |
-| Mac with Intel chip | `AutoSMM-<version>-mac-x64.dmg` |
-
-The apps are not code signed yet, so the first launch shows a warning:
-
-- **Windows:** choose "More info", then "Run anyway".
-- **Mac:** drag AutoSMM to Applications, then right-click it and choose Open the first time. If macOS says the app is damaged, run `xattr -cr /Applications/AutoSMM.app` in Terminal once.
-
-Desktop extras: local models through Ollama work, "Download PDF" saves a real PDF file, and links such as "Post on LinkedIn" open in your normal browser.
-
-**For you (the maintainer):**
-
-- `npm run desktop` builds the app and opens it in a desktop window for testing.
-- `npm run dist:win` and `npm run dist:mac` build installers into `release/`. Windows installers build on Windows and Mac installers build on a Mac, so use the workflow below instead of building both yourself.
-- The `Build desktop apps` workflow (in `.github/workflows`) builds both on GitHub. Push a tag such as `v1.0.0` and the installers are attached to a new Release automatically.
-- To remove the warnings you need to sign the apps: an Apple Developer account (99 USD per year) for Mac, and a code signing certificate for Windows.
-
 ## How it works
 
 Next.js (App Router) and TypeScript. Anthropic uses forced tool use, so the model returns JSON that matches a schema. Other providers use the OpenAI-compatible chat API in JSON mode with the schema in the prompt. Either way the server validates and cleans the result.
@@ -117,6 +99,26 @@ components/        the four steps, settings panel and platform marks
 - Output quality depends on the facts you enter. Thin input gives generic drafts, and the strategy step lists what is missing.
 - Claim checks are text matching, not fact checking. Read every draft before posting.
 - Smaller free models follow instructions less reliably, so expect more rewrites and more flags from the claim checks. Model names are in `lib/providers.ts`.
+
+## For developers
+
+Most people should use the downloads above. To run from source you need [Node.js](https://nodejs.org) 20 or newer.
+
+```bash
+npm install
+npm run dev
+```
+
+Open http://localhost:3000.
+
+Other commands: `npm test`, `npm run typecheck`, `npm run build`, `npm start`.
+
+**For you (the maintainer):**
+
+- `npm run desktop` builds the app and opens it in a desktop window for testing.
+- `npm run dist:win` and `npm run dist:mac` build installers into `release/`. Windows installers build on Windows and Mac installers build on a Mac, so use the workflow below instead of building both yourself.
+- The `Build desktop apps` workflow (in `.github/workflows`) builds both on GitHub. Push a tag such as `v1.0.0` and the installers are attached to a new Release automatically.
+- To remove the warnings you need to sign the apps: an Apple Developer account (99 USD per year) for Mac, and a code signing certificate for Windows.
 
 ## License
 
