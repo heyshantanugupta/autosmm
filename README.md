@@ -16,8 +16,6 @@ Describe your product once. Get a social media strategy, then ready-to-edit post
 
 <br>
 
-<img src="docs/images/drafts.png" alt="AutoSMM drafts screen with fact checks beside an editable post" width="860">
-
 </div>
 
 > [!IMPORTANT]
@@ -80,17 +78,6 @@ Open Settings inside the app and pick a provider. They are grouped by how you us
 4. **Drafts:** editable text with a character counter, a fact check that re-runs as you type, a tracked link with setup help, and "Post on" buttons that copy the post and open the platform.
 5. **Images:** say yes to an image and get a ready-to-paste prompt, plus buttons that open Gemini or ChatGPT.
 
-<table>
-  <tr>
-    <td width="50%"><img src="docs/images/brief.png" alt="The brief step"><br><sub><b>1. Tell it about your product</b></sub></td>
-    <td width="50%"><img src="docs/images/strategy.png" alt="The strategy step"><br><sub><b>2. Review the strategy</b></sub></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/images/drafts.png" alt="The drafts step"><br><sub><b>3. Edit drafts and copy them</b></sub></td>
-    <td width="50%"><img src="docs/images/image-prompt.png" alt="The image prompt panel"><br><sub><b>4. Get an image prompt for Gemini or ChatGPT</b></sub></td>
-  </tr>
-</table>
-
 ## Bring your own key
 
 > [!NOTE]
@@ -140,10 +127,6 @@ lib/postTypes.ts   platform norms, limits and post types
 lib/demo.ts        template output for demo mode
 components/        the four steps, settings panel and platform marks
 ```
-
-## The TheInterviews.ai example
-
-`lib/presets.ts` includes an example brief for TheInterviews.ai, built only from public information. It is there as a demo. Delete `THEINTERVIEWS_EXAMPLE` and the "Load example" button in `components/IntakeStep.tsx` if you do not want it in a public fork.
 
 ## Limits
 

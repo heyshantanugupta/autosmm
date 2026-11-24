@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { applyBatch, hasBatch, EMPTY_BATCH } from "../lib/batch.ts";
 import { checkDraft } from "../lib/claims.ts";
-import { THEINTERVIEWS_EXAMPLE as intake } from "../lib/presets.ts";
+import { SAMPLE_BRIEF as intake } from "./fixtures.ts";
 
 test("an empty batch changes nothing", () => {
   assert.equal(hasBatch(EMPTY_BATCH), false);
@@ -11,20 +11,20 @@ test("an empty batch changes nothing", () => {
 });
 
 test("batch rules are added to the brief rules and enforced", () => {
-  const eff = applyBatch(intake, { tone: "", rules: "Never say recruiters", feature: "" });
-  assert.ok(eff.doNotSay.includes("Never say recruiters"));
+  const eff = applyBatch(intake, { tone: "", rules: "Never say managers", feature: "" });
+  assert.ok(eff.doNotSay.includes("Never say managers"));
   assert.ok(eff.doNotSay.includes(intake.doNotSay.split("\n")[0]));
-  const checks = checkDraft({ body: "Great for recruiters everywhere.", claimsUsed: [] }, eff);
-  assert.ok(checks.some((c) => /recruiters/.test(c.message)));
+  const checks = checkDraft({ body: "Great for managers everywhere.", claimsUsed: [] }, eff);
+  assert.ok(checks.some((c) => /managers/.test(c.message)));
 });
 
 test("feature text counts as a fact, so claims about it are not flagged", () => {
-  const feature = "Profile Cards now show the transcript next to a 94 point score.";
+  const feature = "Reports now show the history next to a 94 point score.";
   const eff = applyBatch(intake, { tone: "", rules: "", feature });
-  const checks = checkDraft({ body: "Profile Cards now show the transcript next to a 94 point score.", claimsUsed: [feature] }, eff);
+  const checks = checkDraft({ body: "Reports now show the history next to a 94 point score.", claimsUsed: [feature] }, eff);
   assert.equal(checks[0].level, "ok");
   // without the feature the same draft is flagged
-  const bare = checkDraft({ body: "Profile Cards now show the transcript next to a 94 point score.", claimsUsed: [feature] }, intake);
+  const bare = checkDraft({ body: "Reports now show the history next to a 94 point score.", claimsUsed: [feature] }, intake);
   assert.ok(bare.some((c) => c.level === "warn"));
 });
 

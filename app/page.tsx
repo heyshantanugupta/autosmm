@@ -8,7 +8,7 @@ import SettingsPanel from "@/components/SettingsPanel";
 import StrategyStep from "@/components/StrategyStep";
 import { requestDrafts, requestStrategy } from "@/lib/client";
 import { getProvider } from "@/lib/providers";
-import { BLANK_INTAKE, THEINTERVIEWS_EXAMPLE } from "@/lib/presets";
+import { BLANK_INTAKE } from "@/lib/presets";
 import {
   DEFAULT_SETTINGS,
   clearAllStoredData,
@@ -269,7 +269,6 @@ export default function Home() {
               intake={intake}
               onChange={setIntake}
               onSubmit={buildStrategy}
-              onLoadExample={() => setIntake(THEINTERVIEWS_EXAMPLE)}
               onStartBlank={() => setIntake(BLANK_INTAKE)}
               loading={loading}
               error={error}

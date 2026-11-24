@@ -3,11 +3,11 @@ import assert from "node:assert/strict";
 import { buildImagePrompt, IMAGE_TOOLS } from "../lib/imagePrompt.ts";
 
 const draft: any = { platform: "instagram", visualIdea: "A desk with a laptop showing a link", hook: "h", body: "b", postTypeLabel: "Founder story", themeId: "t" };
-const intake: any = { productName: "TheInterviews.ai", audience: "Recruiters" };
+const intake: any = { productName: "Brightloop", audience: "Recruiters" };
 
 test("prompt carries the visual idea, product, size and no-text rule", () => {
   const p = buildImagePrompt(draft, intake);
-  assert.match(p, /TheInterviews\.ai/);
+  assert.match(p, /Brightloop/);
   assert.match(p, /A desk with a laptop/);
   assert.match(p, /4:5 portrait/);
   assert.match(p, /Do not include any text/);

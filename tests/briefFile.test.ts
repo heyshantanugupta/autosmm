@@ -1,12 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { briefFileName, parseBriefFile, serializeBrief } from "../lib/briefFile.ts";
-import { BLANK_INTAKE, THEINTERVIEWS_EXAMPLE } from "../lib/presets.ts";
+import { BLANK_INTAKE } from "../lib/presets.ts";
+import { SAMPLE_BRIEF } from "./fixtures.ts";
 
 test("a saved brief loads back unchanged", () => {
-  const r = parseBriefFile(serializeBrief(THEINTERVIEWS_EXAMPLE));
+  const r = parseBriefFile(serializeBrief(SAMPLE_BRIEF));
   assert.ok(r.ok);
-  if (r.ok) assert.deepEqual(r.intake, THEINTERVIEWS_EXAMPLE);
+  if (r.ok) assert.deepEqual(r.intake, SAMPLE_BRIEF);
 });
 
 test("files from somewhere else are refused", () => {

@@ -8,13 +8,12 @@ interface Props {
   intake: Intake;
   onChange: (next: Intake) => void;
   onSubmit: () => void;
-  onLoadExample: () => void;
   onStartBlank: () => void;
   loading: boolean;
   error: string | null;
 }
 
-export default function IntakeStep({ intake, onChange, onSubmit, onLoadExample, onStartBlank, loading, error }: Props) {
+export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, loading, error }: Props) {
   const set = <K extends keyof Intake>(key: K, value: Intake[K]) => onChange({ ...intake, [key]: value });
 
   const toggleChannel = (id: Platform) => {
@@ -63,11 +62,8 @@ export default function IntakeStep({ intake, onChange, onSubmit, onLoadExample, 
           safer the drafts.
         </p>
         <div className="row" style={{ marginTop: 14 }}>
-          <button type="button" className="btn secondary small" onClick={onLoadExample}>
-            Load the TheInterviews.ai example
-          </button>
           <button type="button" className="btn quiet small" onClick={onStartBlank}>
-            Start with a blank brief
+            Clear the form
           </button>
           <button type="button" className="btn secondary small" onClick={() => fileRef.current?.click()}>
             Load a saved brief

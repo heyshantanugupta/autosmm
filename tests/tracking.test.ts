@@ -4,8 +4,8 @@ import { cleanSlug, trackedUrl } from "../lib/tracking.ts";
 
 test("builds a UTM link from the website, platform and slug", () => {
   assert.equal(
-    trackedUrl("https://www.theinterviews.ai", "linkedin", "li-founder-story"),
-    "https://www.theinterviews.ai/?utm_source=linkedin&utm_medium=social&utm_campaign=li-founder-story",
+    trackedUrl("https://www.example.com", "linkedin", "li-founder-story"),
+    "https://www.example.com/?utm_source=linkedin&utm_medium=social&utm_campaign=li-founder-story",
   );
 });
 
