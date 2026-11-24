@@ -82,8 +82,7 @@
     "mac": {
       "category": "public.app-category.business",
       "target": [
-        "dmg",
-        "zip"
+        "dmg"
       ],
       "artifactName": "AutoSMM-${version}-mac-${arch}.${ext}",
       "identity": "-"
@@ -99,7 +98,11 @@
     "afterPack": "scripts/after-pack.cjs",
     "portable": {
       "artifactName": "AutoSMM-Portable-${version}-windows-${arch}.${ext}"
-    }
+    },
+    "electronLanguages": [
+      "en-US"
+    ],
+    "compression": "maximum"
   },
   "allowScripts": {
     "electron": true

@@ -62,8 +62,10 @@ async function startServer() {
   if (!fs.existsSync(entry)) throw new Error(`Missing server files at ${dir}. Run "npm run desktop:build" first.`);
   const port = (await canListen(PREFERRED_PORT)) ? PREFERRED_PORT : await freePort();
   // A utility process runs the server without adding a second icon to the Dock or taskbar.
+  // The heap limit keeps memory use low on computers with little RAM. The app's data is small.
   serverProcess = utilityProcess.fork(entry, [], {
     cwd: dir,
+    execArgv: ["--max-old-space-size=192"],
     stdio: "ignore",
     serviceName: "AutoSMM server",
     env: {
@@ -123,6 +125,7 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      spellcheck: false,
     },
   });
 
