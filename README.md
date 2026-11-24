@@ -42,10 +42,20 @@ Click a button, open the file you downloaded, and follow the prompts. Other opti
 - **All versions:** see the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
 > [!WARNING]
-> The apps are not code signed yet, so the first launch shows a warning. This is expected.
+> The apps are not code signed yet (that costs the developer a yearly fee), so the first launch shows a warning. AutoSMM is open source, so you can read every line of it here. The warning is expected and appears once per install.
 >
-> - **Windows:** choose "More info", then "Run anyway".
-> - **Mac:** drag AutoSMM to Applications, then right-click it and choose Open the first time. If macOS says the app is damaged, run `xattr -cr /Applications/AutoSMM.app` in Terminal once.
+> **Windows:** choose "More info", then "Run anyway".
+>
+> **Mac:** if you see "AutoSMM Not Opened", pick one of these:
+>
+> 1. **Easiest:** drag AutoSMM to Applications and open it. Click **Done** on the warning, then open **System Settings > Privacy & Security**, scroll down to the message about AutoSMM and click **Open Anyway**. Enter your password and open the app again.
+> 2. **One command:** drag AutoSMM to Applications, open **Terminal**, paste this and press Enter, then open the app normally:
+>
+>    ```bash
+>    xattr -cr /Applications/AutoSMM.app
+>    ```
+>
+> Do not click "Move to Trash". If you did, download the app again.
 
 > [!TIP]
 > The desktop app has a few extras: local models through Ollama work, "Download PDF" saves a real PDF file, and links such as "Post on LinkedIn" open in your normal browser.
