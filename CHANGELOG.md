@@ -9,6 +9,7 @@ The newest version is first. Each version here matches a release on the [Release
 - **Write tab.** After the next 7 days, "Show whole plan" lists every planned post, and the list switches to the whole plan on its own when nothing is due this week. "Write a different post" is now "Write my own post", and its page has "Back to my drafts".
 
 - Light animations: Settings fades in and out, tabs, buttons, menu items and plan rows react when you hover or press them. They use only simple fades and small moves, and switch off if your computer is set to reduce motion.
+- The main card on Today widens its green edge and lifts when you hover it, and the number tiles and plan rows highlight too.
 - Settings is now split into Model, Projects, UI Scale and Version. It opens on Model, and each button shows only its own section.
 - The side menu now stays at the left edge on full screen instead of floating in the middle.
 - Settings now has a Projects section (switch, new, rename, duplicate, export, import, delete).
