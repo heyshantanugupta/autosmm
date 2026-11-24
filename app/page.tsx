@@ -552,6 +552,20 @@ export default function Home() {
               onChange={updateSettings}
               onClose={() => setShowSettings(false)}
               onClearData={clearEverything}
+              projects={
+                ready && index ? (
+                  <ProjectMenu
+                    index={index}
+                    onSwitch={switchProject}
+                    onNew={newProject}
+                    onRename={renameActive}
+                    onDuplicate={duplicateProject}
+                    onExport={exportActive}
+                    onImport={importProject}
+                    onDelete={deleteActive}
+                  />
+                ) : null
+              }
             />
           )}
 

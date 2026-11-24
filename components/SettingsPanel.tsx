@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { requestModels } from "@/lib/client";
 import { getProvider, PROVIDERS, PROVIDER_GROUPS, type ProviderId } from "@/lib/providers";
 import { UI_SCALES, type Settings } from "@/lib/storage";
@@ -10,11 +10,12 @@ interface Props {
   onChange: (next: Settings) => void;
   onClose: () => void;
   onClearData: () => void;
+  projects?: ReactNode;
 }
 
 const CUSTOM = "__custom__";
 
-export default function SettingsPanel({ settings, onChange, onClose, onClearData }: Props) {
+export default function SettingsPanel({ settings, onChange, onClose, onClearData, projects }: Props) {
   const set = <K extends keyof Settings>(key: K, value: Settings[K]) => onChange({ ...settings, [key]: value });
   const provider = getProvider(settings.provider);
   const [found, setFound] = useState<string[] | null>(null);
@@ -63,6 +64,7 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
       <h2 id="settings-title">Settings</h2>
 
       <div className="settings-jump" role="group" aria-label="Jump to">
+        {projects && <button type="button" className="btn secondary small" onClick={() => jump("settings-projects")}>Projects</button>}
         <button type="button" className="btn secondary small" onClick={() => jump("model")}>Model</button>
         <button type="button" className="btn secondary small" onClick={() => jump("app-version")}>Version</button>
         <button type="button" className="btn secondary small" onClick={() => jump("ui-scale")}>UI Scale</button>
@@ -203,6 +205,14 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
           </>
         )}
       </div>
+
+      {projects && (
+        <div className="field" id="settings-projects" tabIndex={-1}>
+          <label>Projects</label>
+          <p className="hint">Switch, add, rename, back up or delete projects. Each keeps its own brief, plan and drafts.</p>
+          {projects}
+        </div>
+      )}
 
       <div className="field" id="ui-scale" tabIndex={-1}>
         <label>UI Scale</label>

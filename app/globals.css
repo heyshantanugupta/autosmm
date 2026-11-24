@@ -253,7 +253,7 @@ p {
   justify-content: space-between;
   gap: 16px;
   padding: 24px 44px;
-  max-width: 1480px;
+  max-width: none;
   margin: 0 auto;
 }
 .brand {
@@ -321,7 +321,7 @@ p {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
   gap: 64px;
-  max-width: 1480px;
+  max-width: none;
   margin: 0 auto;
   padding: 24px 44px 140px;
 }
