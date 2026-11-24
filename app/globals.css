@@ -41,20 +41,20 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0e1a17;
-    --surface: #15241f;
-    --surface-2: #1b2f28;
-    --ink: #dff0ea;
-    --muted: #8fa9a0;
-    --line: #243b33;
-    --line-strong: #345148;
+    --bg: #121214;
+    --surface: #1b1b1f;
+    --surface-2: #232328;
+    --ink: #ececf0;
+    --muted: #a3a3ad;
+    --line: #2e2e34;
+    --line-strong: #44444c;
 
     --violet: #3fd0b3;
     --violet-deep: #0d8573;
-    --violet-soft: #11342d;
+    --violet-soft: #17332e;
     --violet-ink: #7ff0d8;
     --teal: #7ddc6a;
-    --teal-soft: #17331a;
+    --teal-soft: #1b301c;
     --teal-ink: #a3ec8f;
     --amber: #fbb040;
     --amber-soft: #3a2a10;
@@ -65,26 +65,26 @@
     --danger: #ff8a95;
     --danger-soft: #3d1820;
     --focus: #5eead4;
-    --on-node: #0e1a17;
+    --on-node: #121214;
     --shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.7);
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0e1a17;
-  --surface: #15241f;
-  --surface-2: #1b2f28;
-  --ink: #dff0ea;
-  --muted: #8fa9a0;
-  --line: #243b33;
-  --line-strong: #345148;
+  --bg: #121214;
+  --surface: #1b1b1f;
+  --surface-2: #232328;
+  --ink: #ececf0;
+  --muted: #a3a3ad;
+  --line: #2e2e34;
+  --line-strong: #44444c;
 
   --violet: #3fd0b3;
   --violet-deep: #0d8573;
-  --violet-soft: #11342d;
+  --violet-soft: #17332e;
   --violet-ink: #7ff0d8;
   --teal: #7ddc6a;
-  --teal-soft: #17331a;
+  --teal-soft: #1b301c;
   --teal-ink: #a3ec8f;
   --amber: #fbb040;
   --amber-soft: #3a2a10;
@@ -95,7 +95,7 @@
   --danger: #ff8a95;
   --danger-soft: #3d1820;
   --focus: #5eead4;
-  --on-node: #0e1a17;
+  --on-node: #121214;
   --shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.7);
 }
 
@@ -277,8 +277,8 @@ p {
   height: 38px;
   border-radius: 12px;
   color: #fff;
-  background: linear-gradient(135deg, #86d86a, #12a58b 55%, #0a6b62);
-  box-shadow: 0 8px 18px -8px rgba(15, 138, 118, 0.7);
+  background: linear-gradient(135deg, #12b5a2, #5b47f5 55%, #e5407e);
+  box-shadow: 0 8px 18px -8px rgba(91, 71, 245, 0.7);
 }
 .mode-pill {
   display: inline-flex;

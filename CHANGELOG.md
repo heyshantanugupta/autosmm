@@ -11,7 +11,7 @@ The newest version is first. Each version here matches a release on the [Release
 - Fixed a crash when clearing the tone field on work saved by an older version.
 - The checklist before posting now explains each point.
 - Today shows the date and a welcome back line.
-- **New colors.** A teal and green scheme replaces the blue and purple, in light and dark mode, with a matching app icon.
+- **New colors.** A teal and green scheme replaces the blue and purple. Dark mode is a neutral dark grey. The logo is unchanged.
 
 ## v1.1.0
 

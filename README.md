@@ -64,7 +64,7 @@ Click a button, open the file you downloaded, and follow the prompts. Other opti
 **v1.2.0**
 - **Projects:** a separate brief, plan and drafts for each product, with a menu to switch, rename, duplicate and delete.
 - **Export and import** a project as a file, for backups or another computer.
-- **New teal and green colors** and a matching app icon.
+- **New teal and green colors**, with a neutral dark grey dark mode.
 
 **v1.1.0**
 - **Today view** with one next step, and tabs for Plan, Write, Reply and Results.
