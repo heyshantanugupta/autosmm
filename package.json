@@ -1,0 +1,104 @@
+{
+  "name": "social-strategy-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AutoSMM: your social media marketing solution. Turn product info into a social media strategy and ready-to-edit post drafts.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
+    "desktop:build": "node scripts/build-desktop.mjs",
+    "desktop": "node scripts/build-desktop.mjs && electron .",
+    "dist": "node scripts/build-desktop.mjs && electron-builder --publish never",
+    "dist:win": "node scripts/build-desktop.mjs && electron-builder --win --x64 --publish never",
+    "dist:mac": "node scripts/build-desktop.mjs && electron-builder --mac --arm64 --x64 --publish never"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.13.0",
+    "@fontsource-variable/google-sans-flex": "^5.3.2",
+    "docx": "^9.16.0",
+    "next": "^16.4.6",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "electron": "^39.8.10",
+    "electron-builder": "^26.18.0",
+    "typescript": "^5.9.0"
+  },
+  "author": {
+    "name": "Shantanu Gupta",
+    "url": "https://github.com/heyshantanugupta"
+  },
+  "homepage": "https://github.com/heyshantanugupta",
+  "main": "electron/main.cjs",
+  "build": {
+    "appId": "com.autosmm.app",
+    "productName": "AutoSMM",
+    "copyright": "Copyright (c) 2026 Shantanu Gupta",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "package.json",
+      "!node_modules/**"
+    ],
+    "extraResources": [
+      {
+        "from": "desktop-server",
+        "to": "server"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "AutoSMM-${version}-windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false
+    },
+    "mac": {
+      "category": "public.app-category.business",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "artifactName": "AutoSMM-${version}-mac-${arch}.${ext}",
+      "identity": "-"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Office",
+      "artifactName": "AutoSMM-${version}-linux-${arch}.${ext}",
+      "executableName": "autosmm"
+    },
+    "afterPack": "scripts/after-pack.cjs"
+  },
+  "allowScripts": {
+    "electron": true
+  }
+}
