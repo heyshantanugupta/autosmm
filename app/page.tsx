@@ -141,6 +141,10 @@ export default function Home() {
     }
   }, [ready, index, intake, strategy, drafts, plan, results, review]);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty("--ui-scale", String(settings.uiScale / 100));
+  }, [settings.uiScale]);
+
   const updateSettings = (next: Settings) => {
     setSettings(next);
     saveSettings(next);

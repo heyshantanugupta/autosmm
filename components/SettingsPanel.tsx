@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { requestModels } from "@/lib/client";
 import { getProvider, PROVIDERS, PROVIDER_GROUPS, type ProviderId } from "@/lib/providers";
-import type { Settings } from "@/lib/storage";
+import { UI_SCALES, type Settings } from "@/lib/storage";
 
 interface Props {
   settings: Settings;
@@ -52,9 +52,21 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
     onChange({ ...settings, provider: id, apiKey: "", model: next.defaultModel });
   };
 
+  const jump = (id: string) => {
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (id !== "app-version") el?.focus();
+  };
+
   return (
     <section className="settings" aria-labelledby="settings-title">
       <h2 id="settings-title">Settings</h2>
+
+      <div className="settings-jump" role="group" aria-label="Jump to">
+        <button type="button" className="btn secondary small" onClick={() => jump("model")}>Model</button>
+        <button type="button" className="btn secondary small" onClick={() => jump("app-version")}>Version</button>
+        <button type="button" className="btn secondary small" onClick={() => jump("ui-scale")}>UI Scale</button>
+      </div>
 
       <div className="check">
         <input
@@ -192,7 +204,19 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
         )}
       </div>
 
-      <p className="hint" id="app-version">
+      <div className="field" id="ui-scale" tabIndex={-1}>
+        <label>UI Scale</label>
+        <p className="hint">Makes text and spacing smaller or larger. Saved on this computer.</p>
+        <div className="scale-row">
+          {UI_SCALES.map((n) => (
+            <button key={n} type="button" className="btn secondary small" aria-pressed={settings.uiScale === n} onClick={() => set("uiScale", n)}>
+              {n}%
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p className="hint" id="app-version" tabIndex={-1}>
         AutoSMM version {process.env.NEXT_PUBLIC_APP_VERSION || "unknown"}
       </p>
 

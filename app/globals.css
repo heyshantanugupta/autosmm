@@ -104,13 +104,14 @@
 }
 html {
   -webkit-text-size-adjust: 100%;
+  font-size: calc(16px * var(--ui-scale, 0.9));
 }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font);
-  font-size: 17px;
+  font-size: 1.0625rem;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
@@ -1663,3 +1664,7 @@ fieldset.field > legend { padding: 0; margin-bottom: 10px; font-weight: 600; }
 .modal h2 { margin: 0 0 10px; font-size: 1.25rem; }
 .modal p { margin: 0 0 20px; color: var(--muted); line-height: 1.5; }
 .modal .row { gap: 10px; }
+
+.settings-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.scale-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.scale-row .btn[aria-pressed="true"] { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; }

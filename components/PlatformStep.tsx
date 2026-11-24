@@ -212,7 +212,7 @@ export default function PlatformStep({ intake, strategy, loading, error, onGener
         </button>
         {hasDrafts && (
           <button type="button" className="btn secondary" onClick={onViewDrafts}>
-            View existing drafts
+            Back to my drafts
           </button>
         )}
         <button type="button" className="btn quiet" onClick={onBack}>
