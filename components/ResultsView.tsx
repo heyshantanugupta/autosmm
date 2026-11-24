@@ -164,7 +164,7 @@ export default function ResultsView(p: Props) {
               </li>
             ))}
           </ul>
-          <div className="row" style={{ marginTop: 14 }}>
+          <div className="row" style={{ marginTop: 22 }}>
             <button type="button" className="btn" onClick={p.onReview} disabled={p.reviewBusy || !p.strategy}>
               {p.reviewBusy ? "Reviewing..." : "Review my results"}
             </button>

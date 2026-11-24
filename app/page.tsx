@@ -714,8 +714,8 @@ export default function Home() {
           <a href="https://github.com/heyshantanugupta" target="_blank" rel="noopener noreferrer">
             GitHub
           </a>{" "}
-          <a href="https://www.linkedin.com/in/heyshantanu" target="_blank" rel="noopener noreferrer">
-            LinkedIn
+          <a href="https://shantanugupta.framer.ai" target="_blank" rel="noopener noreferrer">
+            Portfolio
           </a>
         </p>
       </footer>

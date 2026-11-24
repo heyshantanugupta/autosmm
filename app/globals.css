@@ -1484,7 +1484,6 @@ input[type="radio"] {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin: 20px 0 0;
-  margin: 0;
 }
 .tile {
   padding: 14px 16px;
@@ -1599,7 +1598,7 @@ input[type="radio"] {
 .project-item[aria-current="true"] { background: var(--violet-soft); color: var(--violet-ink); font-weight: 600; }
 .project-item small { font-weight: 500; opacity: 0.8; }
 .project-item:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
-.project-actions { display: flex; flex-wrap: wrap; gap: 6px 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+.project-actions { display: flex; flex-wrap: wrap; gap: 10px 16px; padding-top: 10px; border-top: 1px solid var(--line); }
 .icon-link.danger { color: var(--pink-ink); }
 .project-form { display: grid; gap: 10px; }
 .project-form p { margin: 0; }
@@ -1607,3 +1606,23 @@ input[type="radio"] {
   .project-panel { position: fixed; left: 16px; right: 16px; top: 64px; width: auto; }
 }
 .notice + .drafts-list { margin-top: 18px; }
+
+/* ---- spacing audit ---- */
+/* Cards inside a form (the brief) need the same gap as cards in the page. */
+.stage form > .section + *,
+.stage form > * + .section {
+  margin-top: 28px;
+}
+
+/* Fieldsets used as form fields: no browser box, label styled like other labels */
+fieldset.field { border: 0; padding: 0; margin: 20px 0 0; min-width: 0; }
+fieldset.field > legend { padding: 0; margin-bottom: 10px; font-weight: 600; }
+.hook-list { padding-left: 2em; }
+
+@media (max-width: 860px) {
+  .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .topbar > .row { flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+  .brand small { max-width: 220px; }
+}
+
+.pmark svg { width: 56%; height: 56%; display: block; }

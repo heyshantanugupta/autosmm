@@ -11,6 +11,9 @@ The newest version is first. Each version here matches a release on the [Release
 - Fixed a crash when clearing the tone field on work saved by an older version.
 - The checklist before posting now explains each point.
 - Today shows the date and a welcome back line.
+- Platform tags now use each platform's logo (LinkedIn, Instagram, X, Facebook, YouTube, TikTok, Reddit).
+- Spacing fixes: nothing sits against a border or looks squeezed, including the reply cards, Repurpose and Hook lab, Results, and the top bar on phones.
+- The footer links to the maker's portfolio.
 - **New colors.** A teal and green scheme replaces the blue and purple. Dark mode is a neutral dark grey. The logo is unchanged.
 
 ## v1.1.0
