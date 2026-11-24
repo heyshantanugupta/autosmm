@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import { requestModels } from "@/lib/client";
 import { getProvider, PROVIDERS, PROVIDER_GROUPS, type ProviderId } from "@/lib/providers";
 import SubNav from "./SubNav";
+import VersionCheck from "./VersionCheck";
 import { UI_SCALES, type Settings } from "@/lib/storage";
 
 interface Props {
@@ -241,12 +242,7 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
       </div>
       )}
 
-      {tab === "version" && (
-        <div className="field" id="app-version">
-          <label>Version</label>
-          <p className="hint">AutoSMM version {process.env.NEXT_PUBLIC_APP_VERSION || "unknown"}</p>
-        </div>
-      )}
+      {tab === "version" && <VersionCheck />}
 
       <div className="row">
         <button type="button" className="btn" onClick={close}>
