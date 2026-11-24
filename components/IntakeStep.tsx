@@ -81,12 +81,25 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
   };
 
   const ready = intake.productName.trim().length > 0 && intake.facts.trim().length > 0;
+  const [missingNote, setMissingNote] = useState("");
+  const tryBuild = () => {
+    if (loading) return;
+    if (ready) {
+      setMissingNote("");
+      onSubmit();
+      return;
+    }
+    const noName = intake.productName.trim().length === 0;
+    setMissingNote(noName ? "Add your product name first. Then add at least one fact about it." : "Add at least one fact about your product, such as what it does or who it is for. The agent only writes from the facts you give it.");
+    document.getElementById(noName ? "productName" : "facts")?.focus();
+  };
 
   return (
     <form
+      noValidate
       onSubmit={(e) => {
         e.preventDefault();
-        if (ready && !loading) onSubmit();
+        tryBuild();
       }}
     >
       <div>
@@ -306,11 +319,15 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
       )}
 
       <div className="row" style={{ marginTop: 24 }}>
-        <button className="btn" type="submit" disabled={!ready || loading}>
+        <button className="btn" type="submit" disabled={loading}>
           {loading && <span className="spinner" aria-hidden="true" />}
           {loading ? "Building strategy" : "Build strategy"}
         </button>
-        {!ready && <span className="hint" style={{ margin: 0 }}>Product name and at least one fact are required.</span>}
+        {missingNote && !ready ? (
+          <span className="error" role="alert" style={{ margin: 0 }}>{missingNote}</span>
+        ) : (
+          !ready && <span className="hint" style={{ margin: 0 }}>Product name and at least one fact are required.</span>
+        )}
       </div>
     </form>
   );

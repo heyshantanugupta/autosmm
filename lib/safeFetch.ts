@@ -5,6 +5,9 @@ import { UserFacingError } from "./llm";
 
 const MAX_BYTES = 1_500_000;
 const MAX_REDIRECTS = 4;
+const BOT_UA = "AutoSMM-Importer/1.0 (+https://github.com/heyshantanugupta/autosmm)";
+const BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36";
+const HEADERS = (ua: string) => ({ "User-Agent": ua, Accept: "text/html,application/xhtml+xml", "Accept-Language": "en-US,en;q=0.9" });
 
 /** Local test servers only. Never set this on a hosted copy. */
 const allowPrivate = () => process.env.IMPORT_ALLOW_PRIVATE === "1";
@@ -41,11 +44,10 @@ export async function fetchPublicPage(input: string): Promise<{ url: string; htm
     await assertPublicHost(url);
     let res: Response;
     try {
-      res = await fetch(url, {
-        redirect: "manual",
-        signal: AbortSignal.timeout(10_000),
-        headers: { "User-Agent": "AutoSMM-Importer/1.0 (+https://github.com/heyshantanugupta/autosmm)", Accept: "text/html,application/xhtml+xml" },
-      });
+      const get = (ua: string) => fetch(url, { redirect: "manual", signal: AbortSignal.timeout(15_000), headers: HEADERS(ua) });
+      res = await get(BOT_UA);
+      // Many sites refuse unknown readers. Try once more the way a normal browser asks.
+      if ([401, 403, 406, 429, 503].includes(res.status)) res = await get(BROWSER_UA);
     } catch {
       if (canFallBack && url.protocol === "https:") {
         canFallBack = false;
@@ -59,7 +61,12 @@ export async function fetchPublicPage(input: string): Promise<{ url: string; htm
       url = normalizeSiteUrl(new URL(res.headers.get("location")!, url).toString());
       continue;
     }
-    if (!res.ok) throw new UserFacingError(`The website answered with an error (${res.status}).`, 502);
+    if (!res.ok) {
+      const why = res.status === 404 ? "That page was not found. Check the address." : [401, 403, 406, 429].includes(res.status)
+        ? `That website blocks automated readers (error ${res.status}). Fill in the brief by hand.`
+        : `The website answered with an error (${res.status}). Try again, or fill in the brief by hand.`;
+      throw new UserFacingError(why, 502);
+    }
     const type = res.headers.get("content-type") ?? "";
     if (!/text\/html|application\/xhtml/i.test(type)) throw new UserFacingError("That address is not a web page.", 400);
     const reader = res.body?.getReader();

@@ -27,3 +27,10 @@ test("extractSiteText reads title, description, headings and body, and skips scr
   assert.ok(s.text.includes("Free on iPhone and Android."));
   assert.ok(!s.text.includes("secret") && !s.text.includes("color:red"));
 });
+
+test("extractSiteText falls back to structured data when the page body is empty", () => {
+  const html = `<html><head><title>Acme</title><meta property="og:description" content="Plan your week"><script type="application/ld+json">{"@type":"SoftwareApplication","name":"Acme Planner","description":"Acme turns your goals into a weekly plan."}</script></head><body><div id="root"></div></body></html>`;
+  const s = extractSiteText(html);
+  assert.equal(s.description, "Plan your week");
+  assert.match(s.text, /Acme turns your goals into a weekly plan/);
+});

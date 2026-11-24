@@ -40,11 +40,24 @@ export function extractSiteText(html: string, maxChars = 7000): SiteText {
     if (headings.length >= 30) break;
   }
   const text = clean(body.replace(/<\/(p|div|li|section|h[1-6]|br|tr)>/gi, " . ")).replace(/(\s\.)+\s/g, ". ").slice(0, maxChars);
+  const description = meta(html, "description") || meta(html, "og:description") || meta(html, "twitter:description");
+  let fallback = "";
+  if (text.length < 200) {
+    // Sites built with JavaScript often keep their words in structured data or the page's data script.
+    const parts: string[] = [];
+    for (const m of html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+      for (const s of m[1].matchAll(/"(?:name|description|headline|slogan)"\s*:\s*"((?:[^"\\]|\\.)*)"/g)) parts.push(decode(s[1].replace(/\\"/g, '"')));
+    }
+    for (const m of html.matchAll(/<script[^>]*id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+      for (const s of m[1].matchAll(/"((?:[^"\\]|\\.){25,300})"/g)) if (/\s/.test(s[1]) && !/^https?:|[{}<>]/.test(s[1])) parts.push(decode(s[1]));
+    }
+    fallback = [...new Set(parts)].join(". ").slice(0, maxChars);
+  }
   return {
-    title,
+    title: title || meta(html, "og:title"),
     siteName: meta(html, "og:site_name"),
-    description: meta(html, "description") || meta(html, "og:description"),
+    description,
     headings,
-    text,
+    text: text.length >= 200 ? text : [text, fallback].filter(Boolean).join(". "),
   };
 }
