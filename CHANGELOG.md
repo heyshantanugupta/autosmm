@@ -2,6 +2,10 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.6
+
+- The version you have installed now shows at the bottom of Settings.
+
 ## v1.2.5
 
 - **Easier form.** Every field now has a tag: Required, Recommended or Optional. A required field that is still empty shows a "!" until you fill it, and if you press Build with one missing, it is outlined so you can find it.

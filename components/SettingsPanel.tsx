@@ -192,6 +192,10 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
         )}
       </div>
 
+      <p className="hint" id="app-version">
+        AutoSMM version {process.env.NEXT_PUBLIC_APP_VERSION || "unknown"}
+      </p>
+
       <div className="row">
         <button type="button" className="btn" onClick={onClose}>
           Done
