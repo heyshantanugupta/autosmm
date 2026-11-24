@@ -11,11 +11,11 @@ import { LINK_PLACEMENT, cleanSlug, trackedUrl } from "@/lib/tracking";
 import type { Draft, Intake, Strategy } from "@/lib/types";
 
 type ApprovalKey = "claims" | "link" | "tone" | "read";
-const APPROVAL_ITEMS: { key: ApprovalKey; label: string }[] = [
-  { key: "claims", label: "Claims and numbers are true" },
-  { key: "link", label: "Link works (or there is no link)" },
-  { key: "tone", label: "Sounds like me" },
-  { key: "read", label: "I read it out loud once" },
+const APPROVAL_ITEMS: { key: ApprovalKey; label: string; hint: string }[] = [
+  { key: "claims", label: "Claims and numbers are true", hint: "Every fact, number and promise in the post is real. Ticked for you when the automatic check finds nothing." },
+  { key: "link", label: "Link works, or there is no link", hint: "Click the link once and make sure it opens the right page." },
+  { key: "tone", label: "Sounds like me", hint: "It reads like something you would say. Change any line that feels stiff or salesy." },
+  { key: "read", label: "I read it out loud once", hint: "Reading aloud shows clumsy sentences and typos that are easy to miss on screen." },
 ];
 
 interface Props {
@@ -307,14 +307,18 @@ function DraftSheet({
         </div>
 
         <fieldset className="approval">
-          <legend>Approve this post</legend>
+          <legend>Checklist before posting</legend>
+          <p className="approval-help">Tick each point once it looks right. This is only a reminder, you can post at any time.</p>
           {APPROVAL_ITEMS.map((it) => {
             const auto = it.key === "claims" && !hasWarnings;
             const on = Boolean(draft.approval?.[it.key]) || auto;
             return (
               <label key={it.key} className="approval-item">
                 <input type="checkbox" checked={on} disabled={auto} onChange={(e) => onApproval(draft.id, it.key, e.target.checked)} />
-                <span>{it.label}</span>
+                <span>
+                  <span className="approval-label">{it.label}</span>
+                  <small className="approval-hint">{it.hint}</small>
+                </span>
               </label>
             );
           })}
