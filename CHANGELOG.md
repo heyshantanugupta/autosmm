@@ -2,6 +2,12 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.3
+
+- **Update from inside the app (Windows).** When a new version is out, the banner has an Update now button. It downloads the update, then asks before closing AutoSMM to install it and open the new version. Your work stays saved. This starts with v1.2.3, so the update after it is the first one that installs itself.
+- **Mac update popup.** Mac apps can only update themselves when signed by Apple, so on Mac a popup says a new version is out and links to the download. Open the file to install it over the old one. The portable Windows file does the same.
+- Nothing downloads or installs unless you click.
+
 ## v1.2.2
 
 - **Posts are written from your topic, not copied from it.** A title or short note is now treated as a brief. The writer works out the situation behind it and builds the post around a detail only your product has, instead of repeating your line and adding one. If a draft still opens with your topic, a warning says so.

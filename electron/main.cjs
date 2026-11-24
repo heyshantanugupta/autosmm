@@ -170,6 +170,87 @@ ipcMain.handle("save-pdf", async (event, payload) => {
   }
 });
 
+// ---------- updates ----------
+// Windows installed with the Setup file can update itself. The portable file and the Mac app cannot
+// (Mac only installs updates for apps signed by Apple), so the page shows a link to download instead.
+const canAutoUpdate = () => process.platform === "win32" && app.isPackaged && !process.env.PORTABLE_EXECUTABLE_FILE;
+
+let updater = null;
+let updateState = { status: "idle" };
+
+function setUpdateState(state) {
+  updateState = state;
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send("update-state", state);
+}
+
+function setupUpdater() {
+  if (!canAutoUpdate()) return;
+  try {
+    const { autoUpdater } = require("electron-updater");
+    updater = autoUpdater;
+    // Nothing downloads or installs until the person says so.
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = false;
+    autoUpdater.allowPrerelease = false;
+    autoUpdater.on("update-available", (info) => setUpdateState({ status: "available", version: info.version }));
+    autoUpdater.on("update-not-available", () => setUpdateState({ status: "idle" }));
+    autoUpdater.on("download-progress", (p) =>
+      setUpdateState({ status: "downloading", version: updateState.version, percent: Math.round(p.percent || 0) }),
+    );
+    autoUpdater.on("update-downloaded", (info) => setUpdateState({ status: "ready", version: info.version }));
+    autoUpdater.on("error", () => setUpdateState({ status: "error", version: updateState.version }));
+  } catch {
+    updater = null;
+  }
+}
+
+const fromApp = (event) => {
+  if (!isLocal(event.senderFrame?.url ?? "")) throw new Error("Not allowed.");
+};
+
+ipcMain.handle("update-info", (event) => {
+  fromApp(event);
+  return { canAutoUpdate: Boolean(updater), state: updateState };
+});
+ipcMain.handle("update-check", async (event) => {
+  fromApp(event);
+  if (!updater) return;
+  try {
+    await updater.checkForUpdates();
+  } catch {
+    setUpdateState({ status: "error" });
+  }
+});
+ipcMain.handle("update-download", async (event) => {
+  fromApp(event);
+  if (!updater || updateState.status !== "available") return;
+  setUpdateState({ status: "downloading", version: updateState.version, percent: 0 });
+  try {
+    await updater.downloadUpdate();
+  } catch {
+    setUpdateState({ status: "error", version: updateState.version });
+  }
+});
+// Asks first, then closes the app, installs quietly and opens the new version.
+ipcMain.handle("update-install", async (event) => {
+  fromApp(event);
+  if (!updater || updateState.status !== "ready") return { ok: false };
+  const { response } = await dialog.showMessageBox(mainWindow ?? undefined, {
+    type: "question",
+    buttons: ["Close and install", "Later"],
+    defaultId: 0,
+    cancelId: 1,
+    title: "Install update",
+    message: `Install AutoSMM ${updateState.version ?? ""}?`.trim(),
+    detail: "AutoSMM will close, install the update and open again. Your work stays saved.",
+  });
+  if (response !== 0) return { ok: false };
+  app.isQuitting = true;
+  stopServer();
+  updater.quitAndInstall(true, true);
+  return { ok: true };
+});
+
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
@@ -183,6 +264,7 @@ if (!app.requestSingleInstanceLock()) {
   app.whenReady().then(async () => {
     try {
       await startServer();
+      setupUpdater();
       createWindow();
     } catch (err) {
       dialog.showErrorBox("AutoSMM could not start", String(err && err.message ? err.message : err));

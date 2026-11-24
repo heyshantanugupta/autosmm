@@ -45,12 +45,19 @@ jobs:
       - run: npm run ${{ matrix.script }}
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      # The Windows app updates itself from latest.yml, so the release must carry it.
+      - name: Check the Windows update file exists
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: test -f release/latest.yml
       - uses: actions/upload-artifact@v4
         with:
           name: autosmm-${{ matrix.os }}
           if-no-files-found: error
           path: |
             release/*.exe
+            release/*.exe.blockmap
+            release/latest.yml
             release/*.dmg
 
   release:
