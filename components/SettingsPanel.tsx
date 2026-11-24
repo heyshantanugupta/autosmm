@@ -12,12 +12,21 @@ interface Props {
   onClearData: () => void;
 }
 
+const CUSTOM = "__custom__";
+
 export default function SettingsPanel({ settings, onChange, onClose, onClearData }: Props) {
   const set = <K extends keyof Settings>(key: K, value: Settings[K]) => onChange({ ...settings, [key]: value });
   const provider = getProvider(settings.provider);
   const [found, setFound] = useState<string[] | null>(null);
   const [finding, setFinding] = useState(false);
   const [findError, setFindError] = useState<string | null>(null);
+  const [custom, setCustom] = useState(false);
+
+  // Suggested models first, then anything the key reported, then the current value if it is neither.
+  const options: { id: string; label: string }[] = [...provider.models];
+  for (const id of found ?? []) if (!options.some((m) => m.id === id)) options.push({ id, label: id });
+  const inList = options.some((m) => m.id === settings.model);
+  if (!inList && !custom && settings.model) options.push({ id: settings.model, label: settings.model });
 
   const findModels = async () => {
     setFinding(true);
@@ -39,6 +48,7 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
     const next = getProvider(id);
     setFound(null);
     setFindError(null);
+    setCustom(false);
     onChange({ ...settings, provider: id, apiKey: "", model: next.defaultModel });
   };
 
@@ -127,32 +137,46 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
 
       <div className="field">
         <label htmlFor="model">Model</label>
-        {provider.kind === "anthropic" ? (
-          <select id="model" value={settings.model} onChange={(e) => set("model", e.target.value)} disabled={settings.demo}>
-            {provider.models.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.label}
-              </option>
-            ))}
-          </select>
-        ) : (
+        <select
+          id="model"
+          value={custom ? CUSTOM : settings.model}
+          disabled={settings.demo}
+          onChange={(e) => {
+            if (e.target.value === CUSTOM) {
+              setCustom(true);
+            } else {
+              setCustom(false);
+              set("model", e.target.value);
+            }
+          }}
+        >
+          {options.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.label}
+            </option>
+          ))}
+          {provider.kind !== "anthropic" && <option value={CUSTOM}>Other (type a model id)...</option>}
+        </select>
+        {custom && provider.kind !== "anthropic" && (
+          <input
+            id="model-custom"
+            type="text"
+            aria-label="Model id"
+            placeholder="Model id, as listed by the provider"
+            autoComplete="off"
+            spellCheck={false}
+            style={{ marginTop: 8 }}
+            value={settings.model}
+            disabled={settings.demo}
+            onChange={(e) => set("model", e.target.value)}
+          />
+        )}
+        {provider.kind !== "anthropic" && (
           <>
-            <p className="hint" id="model-hint">
-              Model names change often. If you get a &quot;not available&quot; error, check the provider&apos;s model list and type the
-              current id here.
+            <p className="hint" id="model-hint" style={{ marginTop: 8 }}>
+              Model names change often. If you get a &quot;not available&quot; error, check which models your key can use.
             </p>
-            <input
-              id="model"
-              type="text"
-              list="model-suggestions"
-              aria-describedby="model-hint"
-              autoComplete="off"
-              spellCheck={false}
-              value={settings.model}
-              disabled={settings.demo}
-              onChange={(e) => set("model", e.target.value)}
-            />
-            <div className="row" style={{ marginTop: 8 }}>
+            <div className="row">
               <button
                 type="button"
                 className="btn secondary small"
@@ -161,14 +185,9 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
               >
                 {finding ? "Checking..." : "Check available models"}
               </button>
-              {found && found.length > 0 && <span className="hint">{found.length} found. Click the Model field to pick one.</span>}
+              {found && found.length > 0 && <span className="hint">{found.length} models found and added to the list.</span>}
               {findError && <span className="hint" role="alert">{findError}</span>}
             </div>
-            <datalist id="model-suggestions">
-              {(found ?? provider.models.map((m) => m.id)).map((id) => (
-                <option key={id} value={id} />
-              ))}
-            </datalist>
           </>
         )}
       </div>

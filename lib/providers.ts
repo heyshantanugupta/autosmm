@@ -59,7 +59,11 @@ export const PROVIDERS: Provider[] = [
     needsKey: true,
     kind: "openai-compatible",
     defaultModel: "llama-3.3-70b-versatile",
-    models: [{ id: "llama-3.3-70b-versatile", label: "Llama 3.3 70B" }],
+    models: [
+      { id: "llama-3.3-70b-versatile", label: "Llama 3.3 70B (balanced)" },
+      { id: "llama-3.1-8b-instant", label: "Llama 3.1 8B (fastest)" },
+      { id: "openai/gpt-oss-120b", label: "GPT-OSS 120B (open model)" },
+    ],
   },
   {
     id: "openrouter",
@@ -86,6 +90,7 @@ export const PROVIDERS: Provider[] = [
     models: [
       { id: "gpt-5-mini", label: "GPT-5 mini (cheaper)" },
       { id: "gpt-5", label: "GPT-5 (higher quality)" },
+      { id: "gpt-5-nano", label: "GPT-5 nano (cheapest)" },
     ],
   },
   {
@@ -98,7 +103,7 @@ export const PROVIDERS: Provider[] = [
     needsKey: true,
     kind: "openai-compatible",
     defaultModel: "grok-4.7",
-    models: [{ id: "grok-4.7", label: "Grok 4.7" }],
+    models: [{ id: "grok-4.7", label: "Grok 4.7 (default)" }],
   },
   {
     id: "anthropic",
@@ -126,7 +131,7 @@ export const PROVIDERS: Provider[] = [
     needsKey: false,
     kind: "openai-compatible",
     defaultModel: "llama3.1",
-    models: [{ id: "llama3.1", label: "llama3.1" }],
+    models: [{ id: "llama3.1", label: "llama3.1 (default)" }],
     localOnly: true,
   },
 ];
