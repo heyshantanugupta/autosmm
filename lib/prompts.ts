@@ -10,6 +10,17 @@ export const GROUND_RULES = `Ground rules that apply to everything you write:
 - If the tone notes contain style rules (for example, no em dashes), follow them exactly.
 - You prepare drafts for a human to edit and publish. You never publish anything.`;
 
+/** The brand's look, so scene ideas and image direction match it. Empty when the owner gave none. */
+function brandBlock(i: Intake): string {
+  const rows = [
+    i.brandColors?.trim() && `Colors: ${i.brandColors.trim()}`,
+    i.visualStyle?.trim() && `Picture style: ${i.visualStyle.trim()}`,
+    i.logoNote?.trim() && `Logo: ${i.logoNote.trim()} (added by the owner later, never drawn)`,
+    i.watermark?.trim() && `Watermark: ${i.watermark.trim()} (added by the owner later, never drawn)`,
+  ].filter(Boolean);
+  return rows.length ? `\nBRAND LOOK (for picture ideas only):\n${rows.map((r) => `- ${r}`).join("\n")}` : "";
+}
+
 export function formatIntake(intake: Intake): string {
   const goal = GOALS.find((g) => g.id === intake.goal)?.label ?? intake.goal;
   const lines = (text: string) =>
@@ -34,6 +45,7 @@ export function formatIntake(intake: Intake): string {
     `\nDO NOT SAY / DO NOT DO:\n${lines(intake.doNotSay)}`,
     `\nCURRENT STATE OF THE SOCIAL ACCOUNTS:\n${intake.currentState || "(none provided)"}`,
     voiceBlock(intake.voiceSamples ?? ""),
+    brandBlock(intake),
   ].filter(Boolean).join("\n");
 }
 
@@ -47,6 +59,9 @@ How to build the strategy:
 - Cadence must be sustainable for a small team (for example 3 posts a week on the main channel, not daily on all of them).
 - Measurement must use signals the team can actually see. If the brief shows tracking is limited, say what to track instead.
 - List risks specific to this product and its claims.
+- Make every line specific to this product. If a sentence would still be true after swapping in a competitor's name, rewrite it with a real fact, a real audience situation or a real constraint from the brief.
+- Describe audiences by what they are doing when they need this product (their situation, the words they would use), not by job titles alone.
+- Example angles must be post ideas a person could start writing today: a specific situation plus the product fact that answers it. No slogans, no "tips and tricks" placeholders.
 - List gaps: missing information that would improve the strategy (for example real customer quotes, data, or screenshots).`;
 
 export const STRATEGY_TOOL = {
@@ -118,17 +133,32 @@ export const DRAFTS_SYSTEM = `You are a social media writer who drafts posts for
 
 ${GROUND_RULES}
 
+Treat any topic, title or short note from the user as a brief, never as copy:
+- Do NOT use it as the hook. Do NOT paste or restate it as the first line and then add a sentence. Do NOT end with it either.
+- Work out what the topic is really about for this product: who is in the situation, what it looks like on an ordinary day, what goes wrong, and which provided fact or feature answers it. Then write the post from that. The finished post must say things the topic itself does not.
+- A very short input (a few words, a title) means more thinking from you, not less writing. Choose a concrete angle and commit to it.
+
+Make every post specific to this product and audience:
+- Include at least one detail only this product has: how a feature works, what a user does step by step, a real constraint, or a provided fact. If you could swap in a competitor's name and the post still works, rewrite it.
+- Describe a real situation the audience recognizes (a moment, a task, a frustration) in their own words, before you mention the product. Show the product at the point it helps.
+- Take the brand's goal and the post type into account: a signup post ends with one clear next step, a story post earns its lesson, a teach post gives something usable even if the reader never buys.
+- Banned: "In today's fast-paced world", "game-changer", "unlock", "leverage", "supercharge", "take it to the next level", "Excited to announce", "Here's the thing", "Let that sink in", "Did you know", "Are you tired of", "Whether you're a X or a Y", and lists of three adjectives. Do not stack rhetorical questions.
+- Prefer a plain verb over a flourish, and a concrete noun over a category.
+
 How to write the drafts:
-- Open with a hook that works on its own in the first line. No "In today's fast-paced world", no "Excited to announce".
-- One idea per post. Be concrete: a specific situation, a specific number FROM THE FACTS, a specific step.
+- Open with a hook that works on its own in the first line and creates a reason to read the second.
+- One idea per post, built as: the hook, one concrete scene or example, the point, then at most one call to action.
 - Post types marked "needs real proof" may only use proof points the user provided. If none fit, write the post without invented proof and say so in notes.
 - Give every draft a different angle. Spread the drafts across the strategy themes.
 - In "claimsUsed", list every factual claim the post relies on, copied closely from the user's facts so it can be verified. If the post makes no factual claims, return an empty list.
 - linkSlug: a short lowercase slug the team can use for a tracked link (for example "li-founder-story"). Platform prefix first.
 - bestTime: a practical suggestion and the reason, kept to one short line. It is a suggestion, not a guarantee.
-- visualIdea: one concrete sentence on the picture that goes with the post: the subject, where it is, and what is in frame. Say "a real screenshot of <the actual screen>" only when the post shows a real product screen. No stock-photo ideas.
+- visualIdea: one short sentence on the picture that goes with the post.
+- imageScene: 3 to 4 sentences an image generator can draw. Name the subject, the setting and 2 or 3 specific objects from the audience's real world and this product's category, the camera angle and distance, and the mood that matches the post's feeling. Use the brand look if one is given (colors and picture style). No text, numbers, logos, watermarks or readable screens in the scene, and no recognizable people. If the post shows a real product screen, describe a device or surface with a blurred, unreadable screen so the owner can place the real screenshot over it. Never describe a stock-photo cliche such as a handshake, a lightbulb or a person pointing at a chart.
 - For multi-part formats (threads, carousels, scripts, story sequences) put the whole structure in "body", with clear labels such as "Slide 1:" or "Post 2/6:".
-- If the post type is a Reddit post, do not put a link in the body.`;
+- If the post type is a Reddit post, do not put a link in the body.
+
+Before you submit each draft, check it silently: (1) the first line is not the user's topic or a rewording of it, (2) it contains a product-specific detail, (3) every claim is in the facts, (4) no banned phrase appears. Fix it if any check fails.`;
 
 export const DRAFTS_TOOL = {
   name: "submit_drafts",
@@ -150,10 +180,11 @@ export const DRAFTS_TOOL = {
             linkSlug: { type: "string" },
             bestTime: { type: "string" },
             visualIdea: { type: "string" },
+            imageScene: { type: "string", description: "3 to 4 sentences describing a drawable scene for an image generator. No text, logos or recognizable people." },
             claimsUsed: { type: "array", items: { type: "string" } },
             notes: { type: "string", description: "Anything the human should know before posting." },
           },
-          required: ["postTypeId", "themeId", "hook", "body", "cta", "hashtags", "linkSlug", "bestTime", "visualIdea", "claimsUsed", "notes"],
+          required: ["postTypeId", "themeId", "hook", "body", "cta", "hashtags", "linkSlug", "bestTime", "visualIdea", "imageScene", "claimsUsed", "notes"],
         },
       },
     },
@@ -277,6 +308,7 @@ ${GROUND_RULES}
 
 Topic rules:
 - A topic is an angle in one short line, not a finished post. Example: "Why a resume gap is not the problem people think it is".
+- Each topic names a specific situation or question the audience has, plus the product fact that answers it. Not "Tips for productivity" but "Why your weekly plan falls apart by Wednesday and what a 30 minute reset fixes".
 - Make the topics for the same theme different from each other.
 - Match the kind of post: teach = something useful, story = a real moment or lesson, proof = something real shown or explained, offer = what is new and how to try it.
 - Never put numbers, results or customer claims in a topic unless they appear in the brief.`;

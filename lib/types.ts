@@ -47,6 +47,14 @@ export interface Intake {
   currentState: string;
   /** A few of the user's own past posts, so drafts can match their voice. Style only, never a source of facts. */
   voiceSamples: string;
+  /** Brand colors in plain words or hex, for example "deep teal #0F766E, warm white, one coral accent". Used in image prompts. */
+  brandColors: string;
+  /** How the brand's pictures should look, for example "clean, editorial, lots of white space". */
+  visualStyle: string;
+  /** What the logo looks like and where it goes, for example "white wordmark, bottom-right". Never drawn by the image tool. */
+  logoNote: string;
+  /** Watermark text such as a handle or web address, added to the picture afterwards. */
+  watermark: string;
 }
 
 export interface StrategyAudience {
@@ -107,6 +115,8 @@ export interface Draft {
   linkSlug: string;
   bestTime: string;
   visualIdea: string;
+  /** A detailed, drawable scene for the image generator, written with the post. Empty on older drafts. */
+  imageScene?: string;
   /** Facts from the intake that this draft relies on, as claimed by the model. */
   claimsUsed: string[];
   notes: string;

@@ -37,7 +37,7 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
       const { brief, demo } = await onImport(siteUrl);
       const next = { ...intake };
       let filled = 0;
-      for (const key of ["productName", "oneLiner", "website", "audience", "facts", "proof", "newUpdates"] as const) {
+      for (const key of ["productName", "oneLiner", "website", "audience", "facts", "proof", "newUpdates", "brandColors"] as const) {
         if (!next[key].trim() && brief[key]) {
           next[key] = brief[key];
           filled++;
@@ -308,6 +308,52 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
             rows={5}
             value={intake.voiceSamples}
             onChange={(e) => set("voiceSamples", e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="section">
+        <h2>Brand look (optional)</h2>
+        <p className="hint">Used in the image prompts so pictures look like your brand. Image tools cannot read your website, so say it here.</p>
+        <div className="field">
+          <label htmlFor="brandColors">Brand colors</label>
+          <input
+            id="brandColors"
+            type="text"
+            placeholder="deep teal #0F766E, warm white, one coral accent"
+            value={intake.brandColors}
+            onChange={(e) => set("brandColors", e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="visualStyle">How your pictures should look</label>
+          <input
+            id="visualStyle"
+            type="text"
+            placeholder="clean and editorial, lots of white space, real desks and hands"
+            value={intake.visualStyle}
+            onChange={(e) => set("visualStyle", e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="logoNote">Logo</label>
+          <p className="hint">What it looks like and where it goes. The image tool never draws it: you attach your own file.</p>
+          <input
+            id="logoNote"
+            type="text"
+            placeholder="white wordmark with a round teal icon, bottom-right"
+            value={intake.logoNote}
+            onChange={(e) => set("logoNote", e.target.value)}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="watermark">Watermark</label>
+          <input
+            id="watermark"
+            type="text"
+            placeholder="@yourhandle or yourwebsite.com"
+            value={intake.watermark}
+            onChange={(e) => set("watermark", e.target.value)}
           />
         </div>
       </div>

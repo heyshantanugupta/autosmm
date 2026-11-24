@@ -80,11 +80,22 @@ const clip = (s: string, n: number) => s.replace(/\s+/g, " ").trim().slice(0, n)
 /** A visual idea that only says "use a real screenshot" cannot be drawn by an image tool. */
 const wantsRealScreen = (s: string) => /\b(screenshot|screen recording|screen capture|screen|recording|video|demo)\b/i.test(s);
 
+/** Which corner the owner's logo note asks for. Defaults to bottom-right. */
+function logoCorner(note: string): string {
+  const n = note.toLowerCase();
+  const v = /\btop\b/.test(n) ? "top" : "bottom";
+  const h = /\bleft\b/.test(n) ? "left" : /\bcent(er|re)\b/.test(n) ? "center" : "right";
+  return h === "center" ? `${v} center` : `${v}-${h}`;
+}
+
 /**
  * A ready-to-paste prompt for any image generator. Built from the draft and the brief, so it needs no
- * extra model call. It is laid out in labeled lines (subject, composition, style, light, format, avoid)
- * because image tools follow specific, concrete direction better than a loose idea. It asks for no text
- * in the picture, because image models misspell words and invent numbers; the person adds real text afterwards.
+ * extra model call: the scene comes from the one the writer produced with the post. It is laid out in
+ * labeled lines (subject, composition, style, brand, light, format, avoid) because image tools follow
+ * specific, concrete direction better than a loose idea.
+ *
+ * Image tools cannot read a website and misspell words, so brand colors and style are written out, text is
+ * never drawn in the picture, and the logo and watermark get reserved space for the owner to add afterwards.
  */
 export function buildImagePrompt(draft: Draft, intake: Intake): string {
   const shape = SHAPE[draft.platform];
@@ -92,11 +103,17 @@ export function buildImagePrompt(draft: Draft, intake: Intake): string {
   const name = intake.productName.trim() || "a product";
   const what = clip(intake.oneLiner || "", 160).replace(/[.\s]+$/, "");
   const about = clip(draft.hook || draft.body, 140);
+  const scene = clip(draft.imageScene || "", 600);
   const idea = clip(draft.visualIdea || "", 220);
+  const colors = clip(intake.brandColors || "", 200);
+  const styleNote = clip(intake.visualStyle || "", 200);
+  const logo = clip(intake.logoNote || "", 200);
+  const mark = clip(intake.watermark || "", 60);
 
-  // Use the post's own visual idea when it is a scene an image tool can draw. A "real screenshot" idea
-  // is replaced by a scene that leaves room for the real one.
-  const subject = idea && !wantsRealScreen(idea) ? `${idea}${/[.!?]$/.test(idea) ? "" : "."}` : `${look.subject}.`;
+  // Prefer the writer's detailed scene. Fall back to the short idea when it is something an image tool can
+  // draw. A "real screenshot" idea is replaced by a scene that leaves room for the real one.
+  const pick = scene || (idea && !wantsRealScreen(idea) ? idea : look.subject);
+  const subject = `${pick}${/[.!?]$/.test(pick) ? "" : "."}`;
 
   const lines = [
     `Create ${shape.note} for ${name}${what ? ` (${what})` : ""}.`,
@@ -105,11 +122,20 @@ export function buildImagePrompt(draft: Draft, intake: Intake): string {
     "",
     `Subject: ${subject}`,
     `Composition: ${SAFE[draft.platform]} One clear focal point, simple background, plenty of empty space.`,
-    `Style: ${look.style}.`,
-    `Light and color: ${look.light}. A calm palette of two or three harmonious colors plus one accent. No neon.`,
+    `Style: ${styleNote ? `${styleNote}; ${look.style}` : look.style}.`,
+    colors
+      ? `Brand colors: ${colors}. Use them for the main surfaces and the accent, and keep everything else neutral. No other bright colors.`
+      : "",
+    `Light and color: ${look.light}.${colors ? "" : " A calm palette of two or three harmonious colors plus one accent. No neon."}`,
+    logo
+      ? `Logo space: keep a clean, empty area about 12% of the image width in the ${logoCorner(logo)} corner. Do not draw or invent a logo. If I attach my logo file, place it there exactly as it is, unchanged (logo: ${logo}).`
+      : "",
+    mark
+      ? `Watermark space: keep a small, quiet, low-contrast strip along the bottom edge for "${mark}". Do not type that text into the picture, because image tools misspell it. I will add it afterwards.`
+      : "",
     `Format: ${shape.ratio}.`,
     "",
-    "Avoid: any text, letters, numbers, logos or watermarks; real people's faces; invented screenshots with fake data; clutter; distorted hands.",
+    `Avoid: any text, letters or numbers; ${logo || mark ? "any drawn logo or watermark" : "logos or watermarks"}; real people's faces; invented screenshots with fake data; stock-photo cliches; clutter; distorted hands.`,
   ];
   return lines.filter((l, i) => l !== "" || (i > 0 && lines[i - 1] !== "")).join("\n").trim();
 }

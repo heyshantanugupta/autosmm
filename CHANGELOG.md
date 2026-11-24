@@ -2,6 +2,14 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.2
+
+- **Posts are written from your topic, not copied from it.** A title or short note is now treated as a brief. The writer works out the situation behind it and builds the post around a detail only your product has, instead of repeating your line and adding one. If a draft still opens with your topic, a warning says so.
+- **Less generic writing.** Common filler phrases are banned, and every post needs a concrete scene and a product-specific detail. Strategy themes and 30-day plan topics are also tied to real audience situations and your facts.
+- **Better image prompts.** Each post now comes with a detailed scene written for an image generator, in place of a one-line idea.
+- **Brand look.** A new optional section holds your brand colors, picture style, logo note and watermark. Image prompts use the colors and style, keep clean space for your logo and watermark, and tell the tool not to draw them. You add your real logo file and text afterwards, so nothing is misspelled or redrawn.
+- Start from your website picks up the site's theme color for your brand colors.
+
 ## v1.2.1
 
 - **Better image prompts.** The prompt you paste into Gemini or ChatGPT is now laid out in clear lines: subject, composition for that platform, style, light and color, format, and what to avoid. A draft that only says "use a real screenshot" now becomes a scene that leaves room for your own screenshot.

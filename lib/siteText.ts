@@ -4,6 +4,8 @@ export interface SiteText {
   description: string;
   headings: string[];
   text: string;
+  /** The page's own theme color as a hex value, when it declares one. */
+  themeColor?: string;
 }
 
 const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", rsquo: "'", lsquo: "'", rdquo: '"', ldquo: '"', ndash: "-", mdash: "-", hellip: "..." };
@@ -53,7 +55,10 @@ export function extractSiteText(html: string, maxChars = 7000): SiteText {
     }
     fallback = [...new Set(parts)].join(". ").slice(0, maxChars);
   }
+  const themeRaw = meta(html, "theme-color");
+  const themeColor = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(themeRaw) ? themeRaw.toUpperCase() : undefined;
   return {
+    themeColor,
     title: title || meta(html, "og:title"),
     siteName: meta(html, "og:site_name"),
     description,

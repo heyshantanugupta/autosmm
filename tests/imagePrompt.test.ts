@@ -13,7 +13,7 @@ test("prompt is laid out in labeled lines with product, subject, size and no-tex
   assert.match(p, /Style: .*photograph/);
   assert.match(p, /Light and color:/);
   assert.match(p, /Format: 4:5 portrait/);
-  assert.match(p, /Avoid: any text, letters, numbers, logos or watermarks/);
+  assert.match(p, /Avoid: any text, letters or numbers; logos or watermarks/);
   assert.ok(!p.includes("—"));
 });
 
@@ -42,4 +42,27 @@ test("ChatGPT link prefills, Gemini opens the app", () => {
   assert.equal(g.url("x"), "https://gemini.google.com/app");
   assert.equal(c.url("a b"), "https://chatgpt.com/?q=" + encodeURIComponent("a b"));
   assert.equal(c.url("a".repeat(2000)), "https://chatgpt.com/");
+});
+
+test("uses the writer's detailed scene when there is one", () => {
+  const p = buildImagePrompt({ ...draft, imageScene: "A cluttered team lead's desk at 8am, a half-written goal list on a notepad, a mug, a phone face down." }, intake);
+  assert.match(p, /Subject: A cluttered team lead's desk at 8am/);
+  assert.doesNotMatch(p, /A desk with a laptop showing a link/);
+});
+
+test("brand colors, style, logo and watermark shape the prompt without drawing text", () => {
+  const brand = { ...intake, brandColors: "deep teal #0F766E, warm white", visualStyle: "clean and editorial", logoNote: "white wordmark, top left", watermark: "@brightloop" };
+  const p = buildImagePrompt(draft, brand);
+  assert.match(p, /Brand colors: deep teal #0F766E, warm white\./);
+  assert.match(p, /Style: clean and editorial; /);
+  assert.match(p, /Logo space: .*top-left corner.*Do not draw or invent a logo.*attach my logo file/);
+  assert.match(p, /Watermark space: .*"@brightloop".*Do not type that text/);
+  assert.match(p, /Avoid: any text, letters or numbers; any drawn logo or watermark/);
+  assert.doesNotMatch(p, /No neon/);
+});
+
+test("without brand fields the prompt keeps the default palette and has no logo lines", () => {
+  const p = buildImagePrompt(draft, intake);
+  assert.match(p, /No neon/);
+  assert.doesNotMatch(p, /Logo space|Watermark space|Brand colors/);
 });

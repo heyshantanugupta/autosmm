@@ -226,7 +226,7 @@ export default function Home() {
   const writeForItem = async (item: PlanItem) => {
     if (!strategy) return;
     const res = await requestDrafts(
-      { intake, strategy, platform: item.platform, postTypeIds: [item.postTypeId], perType: 1, instruction: `Topic for this post: ${item.topic}` },
+      { intake, strategy, platform: item.platform, postTypeIds: [item.postTypeId], perType: 1, instruction: `Topic for this post: ${item.topic}\nThis is only the subject. Do not use it as the opening line. Develop it into a post with a specific scene and a detail only this product has.` },
       settings,
     );
     const draft = res.drafts[0];

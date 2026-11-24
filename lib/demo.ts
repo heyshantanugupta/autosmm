@@ -76,6 +76,7 @@ export function demoDrafts(intake: Intake, strategy: Strategy, req: DraftRequest
         linkSlug: `${req.platform.slice(0, 2)}-${typeId}-${i + 1}`,
         bestTime: "Weekday mornings in your audience's time zone, then check your own analytics.",
         visualIdea: "A real screenshot of the product.",
+        imageScene: "",
         claimsUsed: [fact],
         notes: DEMO_NOTE,
       });

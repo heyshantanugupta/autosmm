@@ -10,6 +10,8 @@ export interface ImportedBrief {
   facts: string;
   proof: string;
   newUpdates: string;
+  /** The site's own theme color, if it declares one. Empty otherwise. */
+  brandColors: string;
   missing: string[];
   /** How many model-written facts were dropped because the page does not support them. */
   dropped: number;
@@ -36,6 +38,7 @@ export function basicBrief(s: SiteText, url: string): ImportedBrief {
     facts: facts.join("\n"),
     proof: "",
     newUpdates: "",
+    brandColors: s.themeColor ? `site color ${s.themeColor}` : "",
     missing: ["Who the product is for", "Real proof such as press or numbers", "Pricing or plan details"],
     dropped: 0,
   };
@@ -61,6 +64,7 @@ export function briefFromModel(raw: Record<string, unknown>, s: SiteText, url: s
     facts: cut(facts.kept.join("\n"), 4000) || base.facts,
     proof: cut(proof.kept.join("\n"), 4000),
     newUpdates: cut(updates.kept.join("\n"), 4000),
+    brandColors: base.brandColors,
     missing: missing.length ? missing : base.missing,
     dropped: facts.dropped + proof.dropped + updates.dropped,
   };
