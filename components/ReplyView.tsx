@@ -62,9 +62,14 @@ export default function ReplyView({ onReply }: Props) {
         }}
       />
       {kind === "review" && (
-        <p className="notice">
-          Replies stay calm, do not argue, do not admit fault or promise refunds, and move the details to a private message. Read the review twice before you answer.
-        </p>
+        <div className="notice">
+          <p style={{ margin: 0 }}>
+            Stay calm, do not argue, do not admit fault or promise refunds, and move the details to a private message if you can. Read the review twice before you answer.
+          </p>
+          <p className="hint" style={{ margin: "6px 0 0", fontSize: "0.85rem" }}>
+            Bad publicity is still publicity. Mostly.
+          </p>
+        </div>
       )}
       <div className="section">
         <div className="field">
