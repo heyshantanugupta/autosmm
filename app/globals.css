@@ -1673,3 +1673,35 @@ fieldset.field > legend { padding: 0; margin-bottom: 10px; font-weight: 600; }
 .settings .subnav { margin: 14px 0 26px; }
 .settings .field { margin-bottom: 8px; }
 .settings .row { margin-top: 28px; }
+
+/* ---------- light motion (transform and opacity only) ---------- */
+@keyframes pop-in { from { opacity: 0; transform: translateY(-8px) scale(0.99); } to { opacity: 1; transform: none; } }
+@keyframes pop-out { to { opacity: 0; transform: translateY(-8px) scale(0.99); } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.settings { animation: pop-in 0.18s ease-out; }
+.settings.closing { animation: pop-out 0.14s ease-in forwards; }
+.settings .field, .settings .project-panel, .settings > .check { animation: fade-up 0.18s ease-out; }
+.project-panel:not(.inline), .modal { animation: pop-in 0.15s ease-out; }
+
+.rail button { transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease; }
+.rail button:not(:disabled):hover { transform: translateX(3px); color: var(--ink); }
+.rail .node { transition: transform 0.15s ease; }
+.rail button:not(:disabled):hover .node { transform: scale(1.08); }
+
+.subnav button { transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease; }
+.subnav button:not(:disabled):not([aria-pressed="true"]):hover { background: var(--surface-2); color: var(--ink); }
+.subnav button:active { transform: scale(0.96); }
+
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn.secondary, .btn.quiet { transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease; }
+.icon-link { transition: opacity 0.15s ease, transform 0.12s ease; }
+.icon-link:hover { transform: translateY(-1px); }
+.plan-row, .project-item { transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease; }
+.plan-row:hover { transform: translateY(-1px); border-color: var(--line-strong); }
+
+@media (prefers-reduced-motion: reduce) {
+  .settings, .settings.closing, .settings .field, .settings .project-panel, .settings > .check, .project-panel, .modal { animation: none; }
+  .rail button, .rail .node, .subnav button, .icon-link, .plan-row, .project-item, .btn.secondary, .btn.quiet { transition: none; }
+  .rail button:hover, .rail button:hover .node, .plan-row:hover, .icon-link:hover, .btn:active { transform: none; }
+}

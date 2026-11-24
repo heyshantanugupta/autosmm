@@ -25,6 +25,11 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
   const [findError, setFindError] = useState<string | null>(null);
   const [custom, setCustom] = useState(false);
   const [tab, setTab] = useState<Tab>("model");
+  const [closing, setClosing] = useState(false);
+  const close = () => {
+    setClosing(true);
+    window.setTimeout(onClose, 140);
+  };
 
   // Suggested models first, then anything the key reported, then the current value if it is neither.
   const options: { id: string; label: string }[] = [...provider.models];
@@ -57,7 +62,7 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
   };
 
   return (
-    <section className="settings" aria-labelledby="settings-title">
+    <section className={closing ? "settings closing" : "settings"} aria-labelledby="settings-title">
       <h2 id="settings-title">Settings</h2>
 
       <SubNav
@@ -244,7 +249,7 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
       )}
 
       <div className="row">
-        <button type="button" className="btn" onClick={onClose}>
+        <button type="button" className="btn" onClick={close}>
           Done
         </button>
         <button type="button" className="btn quiet" onClick={onClearData}>
