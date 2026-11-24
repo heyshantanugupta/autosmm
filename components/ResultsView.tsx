@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { formatDay } from "@/lib/dates";
+import type { ReadMetrics } from "@/lib/metrics";
 import { PLATFORM_INFO } from "@/lib/postTypes";
+import { shrinkScreenshot } from "@/lib/screenshotFile";
 import { summarize, type Group } from "@/lib/results";
 import { PLATFORMS, type Platform, type PlanItem, type ResultEntry, type Review, type Strategy } from "@/lib/types";
 
@@ -18,6 +20,9 @@ interface Props {
   onAdd: (entry: Omit<ResultEntry, "id">) => void;
   onRemove: (id: string) => void;
   onReview: () => void;
+  /** Why reading a screenshot is not available right now, or empty when it is. */
+  screenshotBlocked: string;
+  onReadScreenshot: (image: string, platform: Platform) => Promise<ReadMetrics>;
 }
 
 const OTHER = "__other__";
@@ -59,6 +64,8 @@ export default function ResultsView(p: Props) {
   const [likes, setLikes] = useState("");
   const [comments, setComments] = useState("");
   const [views, setViews] = useState("");
+  const [reading, setReading] = useState(false);
+  const [shotNote, setShotNote] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
     if (p.prefillItemId) setPick(p.prefillItemId);
@@ -67,6 +74,31 @@ export default function ResultsView(p: Props) {
   const item = p.plan.find((i) => i.id === pick);
   const themeName = (id: string) => p.strategy?.themes.find((t) => t.id === id)?.name ?? "";
   const stats = useMemo(() => summarize(p.results, themeName), [p.results, p.strategy]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const readShot = async (file: File | undefined) => {
+    if (!file) return;
+    setReading(true);
+    setShotNote(null);
+    try {
+      const m = await p.onReadScreenshot(await shrinkScreenshot(file), item?.platform ?? platform);
+      if (m.likes === null && m.comments === null && m.views === null) {
+        setShotNote({ ok: false, text: m.note || "No numbers were found in that screenshot. Type them in instead." });
+      } else {
+        if (m.likes !== null) setLikes(String(m.likes));
+        if (m.comments !== null) setComments(String(m.comments));
+        if (m.views !== null) setViews(String(m.views));
+        const missing = [m.likes === null && "likes", m.comments === null && "comments", m.views === null && "views"].filter(Boolean);
+        setShotNote({
+          ok: true,
+          text: `Filled in from your screenshot. Check them against the post before you add them.${missing.length ? ` Not shown, so left empty: ${missing.join(", ")}.` : ""}${m.note ? ` ${m.note}` : ""}`,
+        });
+      }
+    } catch (e) {
+      setShotNote({ ok: false, text: e instanceof Error ? e.message : "Could not read that screenshot." });
+    } finally {
+      setReading(false);
+    }
+  };
 
   const add = () => {
     const base = item
@@ -135,6 +167,32 @@ export default function ResultsView(p: Props) {
             <label htmlFor="res-views">Views</label>
             <input id="res-views" type="number" min={0} inputMode="numeric" value={views} onChange={(e) => setViews(e.target.value)} />
           </div>
+        </div>
+        <div className="field">
+          <label htmlFor="res-shot">Or read them from a screenshot</label>
+          <p className="hint" id="res-shot-hint">
+            Screenshot the post showing its numbers, and your AI fills in the boxes above. It goes to your AI provider, like the rest of your brief. We do not
+            read links, because most platforms keep post numbers behind a login, so it would be unreliable, could break at any time and may go against the
+            platform's rules.
+          </p>
+          <input
+            id="res-shot"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            aria-describedby="res-shot-hint"
+            disabled={reading || Boolean(p.screenshotBlocked)}
+            onChange={(e) => {
+              readShot(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+          {p.screenshotBlocked && <p className="hint">{p.screenshotBlocked}</p>}
+          {reading && <p className="hint" role="status">Reading the screenshot...</p>}
+          {shotNote && (
+            <p className={shotNote.ok ? "notice" : "error"} role={shotNote.ok ? "status" : "alert"}>
+              {shotNote.text}
+            </p>
+          )}
         </div>
         <div className="row">
           <button type="button" className="btn" onClick={add} disabled={!likes && !comments && !views}>

@@ -56,6 +56,8 @@ interface ToolCall {
   toolDescription: string;
   schema: Record<string, unknown>;
   maxTokens: number;
+  /** An optional picture for the model to read, as base64 with its type. */
+  image?: { mime: string; data: string };
 }
 
 /**
@@ -78,7 +80,20 @@ async function callAnthropic<T>(opts: ToolCall): Promise<T> {
       model: opts.model,
       max_tokens: opts.maxTokens,
       system: opts.system,
-      messages: [{ role: "user", content: opts.user }],
+      messages: [
+        {
+          role: "user",
+          content: opts.image
+            ? [
+                {
+                  type: "image",
+                  source: { type: "base64", media_type: opts.image.mime as "image/png" | "image/jpeg" | "image/webp", data: opts.image.data },
+                },
+                { type: "text", text: opts.user },
+              ]
+            : opts.user,
+        },
+      ],
       tools: [
         {
           name: opts.toolName,
@@ -161,7 +176,15 @@ async function callOpenAiCompatible<T>(opts: ToolCall): Promise<T> {
       ...(opts.provider.id === "openai" ? { max_completion_tokens: opts.maxTokens } : { max_tokens: opts.maxTokens }),
       messages: [
         { role: "system", content: system },
-        { role: "user", content: opts.user },
+        {
+          role: "user",
+          content: opts.image
+            ? [
+                { type: "text", text: opts.user },
+                { type: "image_url", image_url: { url: `data:${opts.image.mime};base64,${opts.image.data}` } },
+              ]
+            : opts.user,
+        },
       ],
     };
     if (withResponseFormat) body.response_format = { type: "json_object" };

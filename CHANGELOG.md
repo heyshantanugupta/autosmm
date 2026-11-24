@@ -2,6 +2,11 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.7
+
+- **Read numbers from a screenshot.** On the Results page, choose a screenshot of a post and your AI fills in the likes, comments and views. You check them before adding. It works with Gemini, ChatGPT, Claude and Grok, and the screenshot goes to your AI provider like the rest of your brief.
+- Results explains why there is no link field: most platforms keep post numbers behind a login, so reading a link would be unreliable, could break at any time and may go against the platform's rules.
+
 ## v1.2.6
 
 - The version you have installed now shows at the bottom of Settings.

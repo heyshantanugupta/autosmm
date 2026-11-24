@@ -15,7 +15,7 @@ import SubNav from "@/components/SubNav";
 import ThemeToggle from "@/components/ThemeToggle";
 import TodayView from "@/components/TodayView";
 import WriteView from "@/components/WriteView";
-import { requestCalendar, requestDrafts, requestHashtags, requestHooks, requestImport, requestReply, requestReview, requestStrategy } from "@/lib/client";
+import { requestCalendar, requestDrafts, requestHashtags, requestHooks, requestImport, requestMetrics, requestReply, requestReview, requestStrategy } from "@/lib/client";
 import { todayISO } from "@/lib/dates";
 import { projectFileName, parseProjectFile, serializeProject } from "@/lib/projectFile";
 import { addProject, makeMeta, NEW_NAME, removeProject, renameProject, syncAutoName, type ProjectIndex } from "@/lib/projects";
@@ -705,6 +705,14 @@ export default function Home() {
               onAdd={(e) => setResults((cur) => [...cur, { ...e, id: newId() }])}
               onRemove={(id) => setResults((cur) => cur.filter((r) => r.id !== id))}
               onReview={runReview}
+              screenshotBlocked={
+                settings.demo
+                  ? "Reading a screenshot needs a real AI key. Turn off demo mode in Settings."
+                  : !provider.vision
+                    ? `${provider.label} cannot read pictures with its default models. Pick Gemini, ChatGPT or Claude in Settings.`
+                    : ""
+              }
+              onReadScreenshot={async (image, platform) => (await requestMetrics({ image, platform }, settings)).metrics}
             />
           )}
         </main>
