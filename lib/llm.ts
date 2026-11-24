@@ -27,6 +27,8 @@ function openAiBaseUrl(provider: Provider): string {
       return "https://openrouter.ai/api/v1";
     case "openai":
       return process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
+    case "xai":
+      return process.env.XAI_BASE_URL || "https://api.x.ai/v1";
     case "ollama":
       return process.env.OLLAMA_BASE_URL || "http://localhost:11434/v1";
     default:

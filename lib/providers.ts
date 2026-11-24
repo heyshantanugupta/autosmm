@@ -3,7 +3,7 @@
  * Only these fixed endpoints are ever called by the server, so the app cannot be pointed at
  * arbitrary URLs (that would let a visitor make your server call internal addresses).
  */
-export type ProviderId = "gemini" | "groq" | "openrouter" | "openai" | "anthropic" | "ollama";
+export type ProviderId = "gemini" | "groq" | "openrouter" | "openai" | "xai" | "anthropic" | "ollama";
 
 export interface Provider {
   id: ProviderId;
@@ -41,7 +41,7 @@ export const PROVIDERS: Provider[] = [
   {
     id: "groq",
     label: "Groq (free tier)",
-    note: "Free tier with rate limits. Create a key at console.groq.com.",
+    note: "Free tier with rate limits. Groq (with a q) is not the same as xAI Grok. Create a key at console.groq.com.",
     keyUrl: "console.groq.com/keys",
     keyPlaceholder: "gsk_...",
     needsKey: true,
@@ -73,6 +73,17 @@ export const PROVIDERS: Provider[] = [
       { id: "gpt-5-mini", label: "GPT-5 mini (cheaper)" },
       { id: "gpt-5", label: "GPT-5 (higher quality)" },
     ],
+  },
+  {
+    id: "xai",
+    label: "xAI Grok (paid)",
+    note: "Grok, the model from xAI. Uses an xAI API key, which is billed by xAI. Create one at console.x.ai.",
+    keyUrl: "console.x.ai",
+    keyPlaceholder: "xai-...",
+    needsKey: true,
+    kind: "openai-compatible",
+    defaultModel: "grok-4.7",
+    models: [{ id: "grok-4.7", label: "Grok 4.7" }],
   },
   {
     id: "anthropic",

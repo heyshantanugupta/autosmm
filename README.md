@@ -48,9 +48,9 @@ Open the [Releases page](https://github.com/heyshantanugupta/autosmm/releases) a
 
 Open Settings inside the app and pick one:
 
-- **Free:** Google Gemini, Groq or OpenRouter free models. Create a free key, paste it in Settings, done. Free tiers have rate limits.
+- **Free:** Google Gemini, Groq or OpenRouter free models. Create a free key, paste it in Settings, done. Free tiers have rate limits. (Groq with a q is a different company from xAI's Grok.)
 - **Local and free:** Ollama, running on your own computer (works in the desktop app and when you run from source).
-- **Paid:** Anthropic Claude (best quality) or OpenAI ChatGPT. Both need an API key, which is billed separately from any chat subscription.
+- **Paid:** Anthropic Claude (best quality), OpenAI ChatGPT or xAI Grok. Each needs its own API key, which is billed separately from any chat subscription.
 - **No key at all:** turn on Demo mode in Settings. It builds the whole flow from templates, not a model, so you can look around first.
 
 > [!NOTE]
