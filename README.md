@@ -30,16 +30,16 @@ You might be a great developer with a great idea and a great product. But if you
 No Node.js, no terminal and no setup. AutoSMM is a normal desktop app, and everything stays on your own computer, saved work included.
 
 <p align="center">
-  <a href="https://github.com/heyshantanugupta/autosmm/releases/download/v1.2.9/AutoSMM-Setup-1.2.9-windows-x64.exe"><img alt="Download for Windows" src="https://img.shields.io/badge/Download%20for-Windows-0f8a76?style=for-the-badge"></a>
+  <a href="https://github.com/heyshantanugupta/autosmm/releases/download/v1.2.10/AutoSMM-Setup-1.2.10-windows-x64.exe"><img alt="Download for Windows" src="https://img.shields.io/badge/Download%20for-Windows-0f8a76?style=for-the-badge"></a>
   &nbsp;
-  <a href="https://github.com/heyshantanugupta/autosmm/releases/download/v1.2.9/AutoSMM-1.2.9-mac-arm64.dmg"><img alt="Download for Mac, Apple chip" src="https://img.shields.io/badge/Download%20for-Mac%20(Apple%20chip)-12b5a2?style=for-the-badge"></a>
+  <a href="https://github.com/heyshantanugupta/autosmm/releases/download/v1.2.10/AutoSMM-1.2.10-mac-arm64.dmg"><img alt="Download for Mac, Apple chip" src="https://img.shields.io/badge/Download%20for-Mac%20(Apple%20chip)-12b5a2?style=for-the-badge"></a>
   &nbsp;
-  <a href="https://github.com/heyshantanugupta/autosmm/releases/download/v1.2.9/AutoSMM-1.2.9-mac-x64.dmg"><img alt="Download for Mac, Intel chip" src="https://img.shields.io/badge/Download%20for-Mac%20(Intel%20chip)-e5407e?style=for-the-badge"></a>
+  <a href="https://github.com/heyshantanugupta/autosmm/releases/download/v1.2.10/AutoSMM-1.2.10-mac-x64.dmg"><img alt="Download for Mac, Intel chip" src="https://img.shields.io/badge/Download%20for-Mac%20(Intel%20chip)-e5407e?style=for-the-badge"></a>
 </p>
 
 Click a button, open the file you downloaded, and follow the prompts. Other options:
 
-- **Windows without installing:** [AutoSMM-Portable-1.2.9-windows-x64.exe](https://github.com/heyshantanugupta/autosmm/releases/download/v1.2.9/AutoSMM-Portable-1.2.9-windows-x64.exe) runs straight from wherever you save it.
+- **Windows without installing:** [AutoSMM-Portable-1.2.10-windows-x64.exe](https://github.com/heyshantanugupta/autosmm/releases/download/v1.2.10/AutoSMM-Portable-1.2.10-windows-x64.exe) runs straight from wherever you save it.
 - **Not sure which Mac you have?** Open the Apple menu and choose About This Mac. If it says "Chip: Apple M1" (or M2, M3 and so on), use Apple chip. If it says "Intel", use Intel.
 - **All versions:** see the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
