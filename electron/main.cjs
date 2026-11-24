@@ -1,5 +1,4 @@
-const { app, BrowserWindow, dialog, ipcMain, shell } = require("electron");
-const { spawn } = require("node:child_process");
+const { app, BrowserWindow, dialog, ipcMain, shell, utilityProcess } = require("electron");
 const fs = require("node:fs");
 const http = require("node:http");
 const net = require("node:net");
@@ -62,13 +61,13 @@ async function startServer() {
   const entry = path.join(dir, "server.js");
   if (!fs.existsSync(entry)) throw new Error(`Missing server files at ${dir}. Run "npm run desktop:build" first.`);
   const port = (await canListen(PREFERRED_PORT)) ? PREFERRED_PORT : await freePort();
-  serverProcess = spawn(process.execPath, [entry], {
+  // A utility process runs the server without adding a second icon to the Dock or taskbar.
+  serverProcess = utilityProcess.fork(entry, [], {
     cwd: dir,
-    windowsHide: true,
     stdio: "ignore",
+    serviceName: "AutoSMM server",
     env: {
       ...process.env,
-      ELECTRON_RUN_AS_NODE: "1",
       NODE_ENV: "production",
       PORT: String(port),
       HOSTNAME: HOST,

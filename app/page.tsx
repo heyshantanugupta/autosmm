@@ -218,7 +218,7 @@ export default function Home() {
         <div className="row">
           {ready && (
             <span className={`mode-pill ${settings.demo ? "demo" : hasAccess ? "live" : ""}`}>
-              {settings.demo ? "Demo mode" : hasAccess ? `Using ${provider.label.replace(/ \(.*\)$/, "")}` : "No API key yet"}
+              {settings.demo ? "Demo mode" : hasAccess ? `Using ${provider.label}` : "No API key yet"}
             </span>
           )}
           <button type="button" className="btn secondary small" onClick={() => setShowSettings((v) => !v)} aria-expanded={showSettings}>

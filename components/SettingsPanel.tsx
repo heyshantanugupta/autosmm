@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { requestModels } from "@/lib/client";
-import { getProvider, PROVIDERS, type ProviderId } from "@/lib/providers";
+import { getProvider, PROVIDERS, PROVIDER_GROUPS, type ProviderId } from "@/lib/providers";
 import type { Settings } from "@/lib/storage";
 
 interface Props {
@@ -64,7 +64,7 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
       <div className="field">
         <label htmlFor="provider">Model provider</label>
         <p className="hint" id="provider-hint">
-          Start with a free one. Your key goes only to the provider you pick. {provider.note}
+          Your key goes only to the provider you pick. Several have a free tier, so you can try AutoSMM without paying. {provider.note}
         </p>
         <select
           id="provider"
@@ -73,20 +73,24 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
           disabled={settings.demo}
           onChange={(e) => changeProvider(e.target.value as ProviderId)}
         >
-          {PROVIDERS.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.label}
-            </option>
+          {PROVIDER_GROUPS.map((g) => (
+            <optgroup key={g.id} label={g.label}>
+              {PROVIDERS.filter((p) => p.group === g.id).map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.label}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </div>
 
       {provider.needsKey && (
         <div className="field">
-          <label htmlFor="apikey">{provider.label.replace(/ \(.*\)$/, "")} API key</label>
+          <label htmlFor="apikey">{provider.label} API key</label>
           <p className="hint" id="apikey-hint">
             Get one at {provider.keyUrl}. It is sent with each request to this app&apos;s server, passed to{" "}
-            {provider.label.replace(/ \(.*\)$/, "")}, and never stored or logged by the server.
+            {provider.label}, and never stored or logged by the server.
           </p>
           <input
             id="apikey"

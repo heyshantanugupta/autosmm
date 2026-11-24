@@ -45,18 +45,18 @@ Click a button, open the file you downloaded, and follow the prompts. Other opti
 > The apps are not code signed yet, so the first launch shows a warning. This is expected.
 >
 > - **Windows:** choose "More info", then "Run anyway".
-> - **Mac:** drag AutoSMM to Applications and open it. When macOS says it could not verify the app, click **Done** (not Move to Trash), then open **System Settings**, go to **Privacy & Security**, scroll to Security, click **Open Anyway** next to AutoSMM and confirm. You only do this once. If you prefer Terminal, run `xattr -cr /Applications/AutoSMM.app` and open the app again.
+> - **Mac:** drag AutoSMM to Applications, then right-click it and choose Open the first time. If macOS says the app is damaged, run `xattr -cr /Applications/AutoSMM.app` in Terminal once.
 
 > [!TIP]
 > The desktop app has a few extras: local models through Ollama work, "Download PDF" saves a real PDF file, and links such as "Post on LinkedIn" open in your normal browser.
 
 ## Choose how it writes
 
-Open Settings inside the app and pick one:
+Open Settings inside the app and pick a provider. They are grouped by how you usually pay:
 
-- **Free:** Google Gemini, Groq or OpenRouter free models. Create a free key, paste it in Settings, done. Free tiers have rate limits. (Groq with a q is a different company from xAI's Grok.)
-- **Local and free:** Ollama, running on your own computer (works in the desktop app and when you run from source).
-- **Paid:** Anthropic Claude (best quality), OpenAI ChatGPT or xAI Grok. Each needs its own API key, which is billed separately from any chat subscription.
+- **Has a free tier:** Google Gemini, Groq or OpenRouter. Create a key, paste it in Settings, done. Free tiers have rate limits, and a paid key from the same provider works too and gives you higher limits. (Groq with a q is a different company from xAI's Grok.)
+- **Runs on your computer:** Ollama, with models stored on your own machine (works in the desktop app and when you run from source).
+- **Paid API key:** Anthropic Claude (best quality), OpenAI ChatGPT or xAI Grok. Each needs its own API key, which is billed separately from any chat subscription.
 - **No key at all:** turn on Demo mode in Settings. It builds the whole flow from templates, not a model, so you can look around first.
 
 > [!NOTE]

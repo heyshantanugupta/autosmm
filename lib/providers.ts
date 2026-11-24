@@ -5,9 +5,19 @@
  */
 export type ProviderId = "gemini" | "groq" | "openrouter" | "openai" | "xai" | "anthropic" | "ollama";
 
+/** How the provider is usually paid for. Only used to group the list: any provider accepts a paid key. */
+export type ProviderGroup = "free" | "local" | "paid";
+
+export const PROVIDER_GROUPS: { id: ProviderGroup; label: string }[] = [
+  { id: "free", label: "Has a free tier" },
+  { id: "local", label: "Runs on your computer" },
+  { id: "paid", label: "Paid API key" },
+];
+
 export interface Provider {
   id: ProviderId;
   label: string;
+  group: ProviderGroup;
   /** Short note shown in Settings, including whether a free tier exists. */
   note: string;
   keyUrl: string;
@@ -25,8 +35,9 @@ export interface Provider {
 export const PROVIDERS: Provider[] = [
   {
     id: "gemini",
-    label: "Google Gemini (free tier)",
-    note: "Free tier with rate limits. Create a key in Google AI Studio.",
+    label: "Google Gemini",
+    group: "free",
+    note: "Works with a free key (rate limited) or a paid key with higher limits. Create it in Google AI Studio.",
     keyUrl: "aistudio.google.com/apikey",
     keyPlaceholder: "AIza...",
     needsKey: true,
@@ -40,8 +51,9 @@ export const PROVIDERS: Provider[] = [
   },
   {
     id: "groq",
-    label: "Groq (free tier)",
-    note: "Free tier with rate limits. Groq (with a q) is not the same as xAI Grok. Create a key at console.groq.com.",
+    label: "Groq",
+    group: "free",
+    note: "Has a free tier with rate limits, and paid plans with higher limits. Groq (with a q) is not the same as xAI Grok. Create a key at console.groq.com.",
     keyUrl: "console.groq.com/keys",
     keyPlaceholder: "gsk_...",
     needsKey: true,
@@ -51,8 +63,9 @@ export const PROVIDERS: Provider[] = [
   },
   {
     id: "openrouter",
-    label: "OpenRouter (free models)",
-    note: "Some models are free. Pick one whose id ends in :free.",
+    label: "OpenRouter",
+    group: "free",
+    note: "Some models are free (their id ends in :free) and paid models work too. Create a key at openrouter.ai.",
     keyUrl: "openrouter.ai/keys",
     keyPlaceholder: "sk-or-...",
     needsKey: true,
@@ -62,7 +75,8 @@ export const PROVIDERS: Provider[] = [
   },
   {
     id: "openai",
-    label: "OpenAI ChatGPT (paid)",
+    label: "OpenAI ChatGPT",
+    group: "paid",
     note: "Uses an OpenAI API key, which is billed separately from a ChatGPT subscription. Create a key at platform.openai.com.",
     keyUrl: "platform.openai.com/api-keys",
     keyPlaceholder: "sk-...",
@@ -76,7 +90,8 @@ export const PROVIDERS: Provider[] = [
   },
   {
     id: "xai",
-    label: "xAI Grok (paid)",
+    label: "xAI Grok",
+    group: "paid",
     note: "Grok, the model from xAI. Uses an xAI API key, which is billed by xAI. Create one at console.x.ai.",
     keyUrl: "console.x.ai",
     keyPlaceholder: "xai-...",
@@ -87,7 +102,8 @@ export const PROVIDERS: Provider[] = [
   },
   {
     id: "anthropic",
-    label: "Anthropic Claude (paid)",
+    label: "Anthropic Claude",
+    group: "paid",
     note: "Best quality. Pay as you go, billed by Anthropic.",
     keyUrl: "console.anthropic.com",
     keyPlaceholder: "sk-ant-...",
@@ -102,7 +118,8 @@ export const PROVIDERS: Provider[] = [
   },
   {
     id: "ollama",
-    label: "Ollama (local, free)",
+    label: "Ollama",
+    group: "local",
     note: "Runs on your own computer. Needs Ollama installed, and works only when you run this app locally.",
     keyUrl: "ollama.com",
     keyPlaceholder: "",
