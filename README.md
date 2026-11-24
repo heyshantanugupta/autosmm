@@ -8,7 +8,7 @@
 
 Describe your product once. Get a social media strategy, then ready-to-edit posts for LinkedIn, Instagram, X, Facebook, YouTube, TikTok and Reddit.
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-5b47f5)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-0f8a76)](LICENSE)
 ![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-12b5a2)
 ![Free to try](https://img.shields.io/badge/free%20to%20try-Gemini%20%7C%20Groq%20%7C%20Ollama-e5407e)
 ![Bring your own key](https://img.shields.io/badge/bring%20your%20own-API%20key-f5a524)
@@ -30,7 +30,7 @@ You might be a great developer with a great idea and a great product. But if you
 No Node.js, no terminal and no setup. AutoSMM is a normal desktop app, and everything stays on your own computer, saved work included.
 
 <p align="center">
-  <a href="https://github.com/heyshantanugupta/autosmm/releases/download/v1.1.0/AutoSMM-Setup-1.1.0-windows-x64.exe"><img alt="Download for Windows" src="https://img.shields.io/badge/Download%20for-Windows-5b47f5?style=for-the-badge"></a>
+  <a href="https://github.com/heyshantanugupta/autosmm/releases/download/v1.1.0/AutoSMM-Setup-1.1.0-windows-x64.exe"><img alt="Download for Windows" src="https://img.shields.io/badge/Download%20for-Windows-0f8a76?style=for-the-badge"></a>
   &nbsp;
   <a href="https://github.com/heyshantanugupta/autosmm/releases/download/v1.1.0/AutoSMM-1.1.0-mac-arm64.dmg"><img alt="Download for Mac, Apple chip" src="https://img.shields.io/badge/Download%20for-Mac%20(Apple%20chip)-12b5a2?style=for-the-badge"></a>
   &nbsp;
@@ -64,6 +64,7 @@ Click a button, open the file you downloaded, and follow the prompts. Other opti
 **v1.2.0**
 - **Projects:** a separate brief, plan and drafts for each product, with a menu to switch, rename, duplicate and delete.
 - **Export and import** a project as a file, for backups or another computer.
+- **New teal and green colors** and a matching app icon.
 
 **v1.1.0**
 - **Today view** with one next step, and tabs for Plan, Write, Reply and Results.

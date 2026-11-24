@@ -115,7 +115,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 600,
     title: "AutoSMM",
-    backgroundColor: "#14172b",
+    backgroundColor: "#0e1a17",
     autoHideMenuBar: true,
     icon: path.join(__dirname, "..", "build", "icon.png"),
     webPreferences: {
