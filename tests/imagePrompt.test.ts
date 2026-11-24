@@ -66,3 +66,49 @@ test("without brand fields the prompt keeps the default palette and has no logo 
   assert.match(p, /No neon/);
   assert.doesNotMatch(p, /Logo space|Watermark space|Brand colors/);
 });
+
+import { buildLogoPrompt, parseCorner } from "../lib/imagePrompt.ts";
+import { pickColors } from "../lib/logo.ts";
+import { stampLayout } from "../lib/stamp.ts";
+
+test("an uploaded logo reserves space even with no logo note", () => {
+  const p = buildImagePrompt(draft, intake, { hasLogo: true });
+  assert.match(p, /Logo space: .*bottom-right corner.*Do not draw or invent a logo/);
+  assert.match(p, /Avoid: any text, letters or numbers; any drawn logo or watermark/);
+});
+
+test("the logo prompt uses the brief and asks for one flat mark", () => {
+  const p = buildLogoPrompt({ ...intake, brandColors: "deep teal, coral", visualStyle: "friendly" });
+  assert.match(p, /Design a logo for /);
+  assert.match(p, /Colors: deep teal, coral\. Use at most two\./);
+  assert.match(p, /Style: friendly; flat vector look/);
+  assert.match(p, /spelled exactly like this/);
+});
+
+test("parseCorner reads the logo note", () => {
+  assert.deepEqual(parseCorner("white wordmark, top left"), { v: "top", h: "left" });
+  assert.deepEqual(parseCorner("center bottom"), { v: "bottom", h: "center" });
+  assert.deepEqual(parseCorner(""), { v: "bottom", h: "right" });
+});
+
+test("pickColors ignores white and transparent pixels and merges close shades", () => {
+  const px: number[] = [];
+  const add = (r: number, g: number, b: number, a: number, n: number) => { for (let i = 0; i < n; i++) px.push(r, g, b, a); };
+  add(255, 255, 255, 255, 500);
+  add(10, 10, 10, 0, 500);
+  add(15, 118, 110, 255, 300);
+  add(18, 120, 112, 255, 100);
+  add(240, 90, 70, 255, 120);
+  assert.deepEqual(pickColors(px), ["#0F766E", "#F05A46"]);
+});
+
+test("stampLayout puts the logo in its corner and the watermark away from it", () => {
+  const l = stampLayout({ w: 1000, h: 500 }, { w: 200, h: 100 }, { v: "bottom", h: "right" }, true);
+  assert.deepEqual(l.logo, { x: 850, y: 410, w: 120, h: 60 });
+  assert.equal(l.watermark?.align, "left");
+  const top = stampLayout({ w: 1000, h: 500 }, { w: 200, h: 100 }, { v: "top", h: "left" }, true);
+  assert.deepEqual(top.logo, { x: 30, y: 30, w: 120, h: 60 });
+  assert.equal(top.watermark?.align, "right");
+  const none = stampLayout({ w: 1000, h: 500 }, null, { v: "bottom", h: "right" }, false);
+  assert.deepEqual(none, { logo: null, watermark: null });
+});

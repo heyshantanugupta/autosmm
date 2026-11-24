@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import LogoField from "@/components/LogoField";
 import { briefFileName, parseBriefFile, serializeBrief } from "@/lib/briefFile";
 import { briefStrength } from "@/lib/briefStrength";
 import type { ImportedBrief } from "@/lib/importBrief";
@@ -335,17 +336,7 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
             onChange={(e) => set("visualStyle", e.target.value)}
           />
         </div>
-        <div className="field">
-          <label htmlFor="logoNote">Logo</label>
-          <p className="hint">What it looks like and where it goes. The image tool never draws it: you attach your own file.</p>
-          <input
-            id="logoNote"
-            type="text"
-            placeholder="white wordmark with a round teal icon, bottom-right"
-            value={intake.logoNote}
-            onChange={(e) => set("logoNote", e.target.value)}
-          />
-        </div>
+        <LogoField intake={intake} onChange={onChange} />
         <div className="field">
           <label htmlFor="watermark">Watermark</label>
           <input

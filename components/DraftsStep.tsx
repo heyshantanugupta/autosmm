@@ -1,12 +1,15 @@
 "use client";
 
 import PlatformMark from "./PlatformMark";
-import { useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { applyBatch } from "@/lib/batch";
 import { checkDraft } from "@/lib/claims";
 import { PLATFORM_INFO, getPostType } from "@/lib/postTypes";
 import { composeTarget } from "@/lib/compose";
+import { ProjectIdContext } from "@/components/ProjectContext";
+import StampTool from "@/components/StampTool";
 import { IMAGE_TOOLS, buildImagePrompt } from "@/lib/imagePrompt";
+import { loadLogo } from "@/lib/logo";
 import { LINK_PLACEMENT, cleanSlug, trackedUrl } from "@/lib/tracking";
 import type { Draft, Intake, Strategy } from "@/lib/types";
 
@@ -95,7 +98,12 @@ function DraftSheet({
   const [wantsImage, setWantsImage] = useState<boolean | null>(null);
   const [imgNote, setImgNote] = useState<string | null>(null);
   const [promptCopied, setPromptCopied] = useState(false);
-  const imagePrompt = useMemo(() => buildImagePrompt(draft, intake), [draft, intake]);
+  const projectId = useContext(ProjectIdContext);
+  const [hasLogo, setHasLogo] = useState(false);
+  useEffect(() => {
+    setHasLogo(Boolean(loadLogo(projectId)));
+  }, [projectId]);
+  const imagePrompt = useMemo(() => buildImagePrompt(draft, intake, { hasLogo }), [draft, intake, hasLogo]);
   const copyPrompt = async () => {
     const ok = await copyText(imagePrompt);
     setPromptCopied(ok);
@@ -302,6 +310,7 @@ function DraftSheet({
               <button type="button" className="btn secondary small" onClick={copyPrompt}>
                 {promptCopied ? "Copied" : "Copy prompt"}
               </button>
+              <StampTool intake={intake} />
             </div>
           )}
         </div>

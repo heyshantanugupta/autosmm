@@ -80,11 +80,22 @@ const clip = (s: string, n: number) => s.replace(/\s+/g, " ").trim().slice(0, n)
 /** A visual idea that only says "use a real screenshot" cannot be drawn by an image tool. */
 const wantsRealScreen = (s: string) => /\b(screenshot|screen recording|screen capture|screen|recording|video|demo)\b/i.test(s);
 
-/** Which corner the owner's logo note asks for. Defaults to bottom-right. */
-function logoCorner(note: string): string {
+export interface Corner {
+  v: "top" | "bottom";
+  h: "left" | "right" | "center";
+}
+
+/** Which corner a logo note asks for ("white wordmark, top left"). Defaults to bottom-right. */
+export function parseCorner(note: string): Corner {
   const n = note.toLowerCase();
   const v = /\btop\b/.test(n) ? "top" : "bottom";
   const h = /\bleft\b/.test(n) ? "left" : /\bcent(er|re)\b/.test(n) ? "center" : "right";
+  return { v, h };
+}
+
+/** Which corner the owner's logo note asks for, in words. Defaults to bottom-right. */
+function logoCorner(note: string): string {
+  const { v, h } = parseCorner(note);
   return h === "center" ? `${v} center` : `${v}-${h}`;
 }
 
@@ -97,7 +108,7 @@ function logoCorner(note: string): string {
  * Image tools cannot read a website and misspell words, so brand colors and style are written out, text is
  * never drawn in the picture, and the logo and watermark get reserved space for the owner to add afterwards.
  */
-export function buildImagePrompt(draft: Draft, intake: Intake): string {
+export function buildImagePrompt(draft: Draft, intake: Intake, opts: { hasLogo?: boolean } = {}): string {
   const shape = SHAPE[draft.platform];
   const look = LOOK[kindOf(draft)];
   const name = intake.productName.trim() || "a product";
@@ -109,6 +120,7 @@ export function buildImagePrompt(draft: Draft, intake: Intake): string {
   const styleNote = clip(intake.visualStyle || "", 200);
   const logo = clip(intake.logoNote || "", 200);
   const mark = clip(intake.watermark || "", 60);
+  const logoOn = Boolean(logo) || Boolean(opts.hasLogo);
 
   // Prefer the writer's detailed scene. Fall back to the short idea when it is something an image tool can
   // draw. A "real screenshot" idea is replaced by a scene that leaves room for the real one.
@@ -127,17 +139,40 @@ export function buildImagePrompt(draft: Draft, intake: Intake): string {
       ? `Brand colors: ${colors}. Use them for the main surfaces and the accent, and keep everything else neutral. No other bright colors.`
       : "",
     `Light and color: ${look.light}.${colors ? "" : " A calm palette of two or three harmonious colors plus one accent. No neon."}`,
-    logo
-      ? `Logo space: keep a clean, empty area about 12% of the image width in the ${logoCorner(logo)} corner. Do not draw or invent a logo. If I attach my logo file, place it there exactly as it is, unchanged (logo: ${logo}).`
+    logoOn
+      ? `Logo space: keep a clean, empty area about 12% of the image width in the ${logoCorner(logo)} corner. Do not draw or invent a logo. If I attach my logo file, place it there exactly as it is, unchanged${logo ? ` (logo: ${logo})` : ""}.`
       : "",
     mark
       ? `Watermark space: keep a small, quiet, low-contrast strip along the bottom edge for "${mark}". Do not type that text into the picture, because image tools misspell it. I will add it afterwards.`
       : "",
     `Format: ${shape.ratio}.`,
     "",
-    `Avoid: any text, letters or numbers; ${logo || mark ? "any drawn logo or watermark" : "logos or watermarks"}; real people's faces; invented screenshots with fake data; stock-photo cliches; clutter; distorted hands.`,
+    `Avoid: any text, letters or numbers; ${logoOn || mark ? "any drawn logo or watermark" : "logos or watermarks"}; real people's faces; invented screenshots with fake data; stock-photo cliches; clutter; distorted hands.`,
   ];
   return lines.filter((l, i) => l !== "" || (i > 0 && lines[i - 1] !== "")).join("\n").trim();
+}
+
+/** A ready-to-paste prompt for an image tool, for owners who have no logo yet. It asks for one simple, flat mark. */
+export function buildLogoPrompt(intake: Intake): string {
+  const name = intake.productName.trim() || "my business";
+  const what = clip(intake.oneLiner || "", 160).replace(/[.\s]+$/, "");
+  const colors = clip(intake.brandColors || "", 200);
+  const styleNote = clip(intake.visualStyle || "", 200);
+  return [
+    `Design a logo for ${name}${what ? ` (${what})` : ""}.`,
+    intake.audience.trim() ? `It speaks to: ${clip(intake.audience, 160)}.` : "",
+    "Mark: one simple, memorable symbol that fits what the business does. A clear shape that still reads at 32 pixels.",
+    `Wordmark: the name "${name}" in a clean sans-serif, spelled exactly like this.`,
+    colors ? `Colors: ${colors}. Use at most two.` : "Colors: one main color and one accent.",
+    `Style: ${styleNote ? `${styleNote}; ` : ""}flat vector look, no gradients, no shadows.`,
+    "Background: plain white, nothing else in the image.",
+    "Format: square, 1:1, one logo only, centered with a generous margin.",
+    "",
+    "Avoid: photos, 3D effects, mockups, taglines, extra words, tiny details.",
+  ]
+    .filter((l, i, a) => l !== "" || (i > 0 && a[i - 1] !== ""))
+    .join("\n")
+    .trim();
 }
 
 export interface ImageTool {

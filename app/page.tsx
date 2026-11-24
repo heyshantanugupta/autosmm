@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import CalendarView from "@/components/CalendarView";
+import { ProjectIdContext } from "@/components/ProjectContext";
 import IntakeStep from "@/components/IntakeStep";
 import PlatformStep from "@/components/PlatformStep";
 import UpdateNotice from "@/components/UpdateNotice";
@@ -480,6 +481,7 @@ export default function Home() {
   };
 
   return (
+    <ProjectIdContext.Provider value={index?.activeId ?? ""}>
     <div className="app" data-step={tab}>
       <header className="topbar">
         <div className="brand">
@@ -722,5 +724,6 @@ export default function Home() {
         </p>
       </footer>
     </div>
+    </ProjectIdContext.Provider>
   );
 }

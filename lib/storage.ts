@@ -1,3 +1,4 @@
+import { removeLogo } from "./logo";
 import { DEFAULT_PROVIDER, getProvider, type ProviderId } from "./providers";
 import { cleanIndex, FIRST_NAME, makeMeta, type ProjectIndex } from "./projects";
 import { cleanWorkspace, type Workspace } from "./workspaceClean";
@@ -102,6 +103,7 @@ export function saveProject(id: string, w: Workspace) {
 export function deleteProjectData(id: string) {
   if (typeof window === "undefined") return;
   remove(window.localStorage, projectKey(id));
+  removeLogo(id);
 }
 
 export function saveIndex(index: ProjectIndex) {
@@ -150,7 +152,10 @@ export function clearAllStoredData() {
   try {
     const raw = read(window.localStorage, INDEX_KEY);
     const index = raw ? cleanIndex(JSON.parse(raw)) : null;
-    for (const p of index?.projects ?? []) remove(window.localStorage, projectKey(p.id));
+    for (const p of index?.projects ?? []) {
+      remove(window.localStorage, projectKey(p.id));
+      removeLogo(p.id);
+    }
   } catch {
     /* ignore */
   }
