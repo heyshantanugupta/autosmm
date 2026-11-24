@@ -2,6 +2,11 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.1
+
+- Start from your website now works on more sites: it retries the way a browser asks when a site refuses it, reads sites that build their text with JavaScript, and says plainly when a site blocks it.
+- Build strategy no longer sits silently greyed out or shows a hidden tooltip. If the name or a fact is missing, it says what to add and jumps to that field.
+
 ## v1.2.0
 
 - **Projects.** Keep a separate brief, strategy, plan, drafts and results for each product, like save slots. Use the project menu at the top to switch, start a new project, rename, duplicate or delete.
@@ -14,8 +19,6 @@ The newest version is first. Each version here matches a release on the [Release
 - Platform tags now use each platform's logo (LinkedIn, Instagram, X, Facebook, YouTube, TikTok, Reddit).
 - Spacing fixes: nothing sits against a border or looks squeezed, including the reply cards, Repurpose and Hook lab, Results, and the top bar on phones.
 - The footer links to the maker's portfolio.
-- Start from your website now works on more sites: it retries the way a browser asks when a site refuses it, reads sites that build their text with JavaScript, and says plainly when a site blocks it.
-- Build strategy no longer sits silently greyed out or shows a hidden tooltip. If the name or a fact is missing, it says what to add and jumps to that field.
 - **New colors.** A teal and green scheme replaces the blue and purple. Dark mode is a neutral dark grey. The logo is unchanged.
 
 ## v1.1.0

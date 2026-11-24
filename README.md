@@ -71,6 +71,9 @@ You also get strategy, a 30-day plan, a reply helper, a results review and proje
 
 ## What's new
 
+**v1.2.1**
+- **Start from your website** works on more sites, and **Build strategy** now tells you what is missing.
+
 **v1.2.0**
 - **Projects:** a separate brief, plan and drafts for each product, with a menu to switch, rename, duplicate and delete.
 - **Export and import** a project as a file, for backups or another computer.
