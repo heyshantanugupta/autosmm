@@ -5,6 +5,7 @@ The newest version is first. Each version here matches a release on the [Release
 ## v1.2.10
 
 - **Settings tabs.** Settings is now split into Model, Projects, UI Scale and Version. It opens on Model, and each button shows only its own section. The Projects list now sits open inside its tab.
+- **Check for updates.** The Version tab in Settings has a Check for updates button, so you do not need to close the app. On Windows it can download and install right there.
 - Light animations: Settings fades in and out, and tabs, buttons, menu items and plan rows react when you hover or press them. They use only simple fades and small moves, and switch off if your computer is set to reduce motion.
 - The main card on Today widens its green edge and lifts when you hover it, and the number tiles and plan rows highlight too.
 
