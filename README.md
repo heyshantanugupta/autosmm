@@ -59,6 +59,7 @@ Click a button, open the file you downloaded, and follow the prompts. Other opti
 
 **v1.1.0**
 - **Start from your website:** paste your address and AutoSMM fills in a first draft of your brief. It only uses what the page says.
+- **Light and dark mode button** in the top right corner.
 - A cleaner README.
 
 See [every version](CHANGELOG.md).

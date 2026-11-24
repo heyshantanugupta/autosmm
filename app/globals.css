@@ -3,6 +3,7 @@
    colour, each platform keeps its own, and teal / amber mean pass / check. */
 
 :root {
+  color-scheme: light;
   --bg: #f5f6fc;
   --surface: #ffffff;
   --surface-2: #fafbff;
@@ -36,7 +37,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --bg: #14172b;
     --surface: #1c2038;
     --surface-2: #232845;
@@ -64,6 +66,35 @@
     --on-node: #14172b;
     --shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.7);
   }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #14172b;
+  --surface: #1c2038;
+  --surface-2: #232845;
+  --ink: #e2e5f4;
+  --muted: #9aa1c2;
+  --line: #2d3254;
+  --line-strong: #3f4570;
+
+  --violet: #8c7dff;
+  --violet-deep: #6b58ff;
+  --violet-soft: #26244f;
+  --violet-ink: #b8aeff;
+  --teal: #2dd4bf;
+  --teal-soft: #0f3a3a;
+  --teal-ink: #5eead4;
+  --amber: #fbb040;
+  --amber-soft: #3a2a10;
+  --amber-ink: #fcc66f;
+  --pink: #ff6fa3;
+  --pink-soft: #3f1630;
+  --pink-ink: #ff9bc0;
+  --danger: #ff8a95;
+  --danger-soft: #3d1820;
+  --focus: #7ea2ff;
+  --on-node: #14172b;
+  --shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.7);
 }
 
 * {
@@ -167,15 +198,23 @@ p {
   --pc: #f2531c;
 }
 @media (prefers-color-scheme: dark) {
-  [data-p="x"],
-  [data-p="tiktok"] {
+ :root:not([data-theme="light"]) [data-p="x"],
+ :root:not([data-theme="light"]) [data-p="tiktok"] {
+     --pc: #d7daf0;
+     --on-pc: #14172b;
+   }
+ :root:not([data-theme="light"]) .pmark[data-p="tiktok"] {
+     background: linear-gradient(135deg, #d7daf0 55%, #5fd4dc);
+   }
+}
+:root[data-theme="dark"] [data-p="x"],
+:root[data-theme="dark"] [data-p="tiktok"] {
     --pc: #d7daf0;
     --on-pc: #14172b;
   }
-  .pmark[data-p="tiktok"] {
+:root[data-theme="dark"] .pmark[data-p="tiktok"] {
     background: linear-gradient(135deg, #d7daf0 55%, #5fd4dc);
   }
-}
 
 .pmark {
   flex: none;
@@ -1197,3 +1236,27 @@ input[type="radio"] {
 .export { align-items: center; gap: 12px; margin-top: 36px; padding-top: 24px; border-top: 1px dashed var(--line-strong); }
 .export-label { font-weight: 600; color: var(--muted); font-size: 0.95rem; margin-right: 8px; }
 .export + .notice { margin-top: 14px; }
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--violet-ink);
+  cursor: pointer;
+}
+.icon-btn:hover {
+  background: var(--violet-soft);
+}
+.icon-btn:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+}

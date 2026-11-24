@@ -5,6 +5,7 @@ The newest version is first. Each version here matches a release on the [Release
 ## v1.1.0
 
 - **Start from your website.** Paste your address and AutoSMM fills in a first draft of your brief from what the page says. It only fills empty fields, drops anything the page does not support, and lists what the page did not say so you can add it.
+- **Light and dark mode button** in the top right corner. It starts from your computer's setting and remembers your choice.
 - The TheInterviews.ai example brief is no longer part of the app.
 - Cleaner README, and this changelog.
 

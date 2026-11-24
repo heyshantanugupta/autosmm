@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import DraftsStep from "@/components/DraftsStep";
 import IntakeStep from "@/components/IntakeStep";
 import PlatformStep from "@/components/PlatformStep";
+import ThemeToggle from "@/components/ThemeToggle";
 import SettingsPanel from "@/components/SettingsPanel";
 import StrategyStep from "@/components/StrategyStep";
 import { requestDrafts, requestImport, requestStrategy } from "@/lib/client";
@@ -224,6 +225,7 @@ export default function Home() {
           <button type="button" className="btn secondary small" onClick={() => setShowSettings((v) => !v)} aria-expanded={showSettings}>
             Settings
           </button>
+          <ThemeToggle />
         </div>
       </header>
 
