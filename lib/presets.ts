@@ -13,4 +13,5 @@ export const BLANK_INTAKE: Intake = {
   doNotSay: "",
   tone: "",
   currentState: "",
+  voiceSamples: "",
 };

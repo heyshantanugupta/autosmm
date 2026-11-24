@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { briefFileName, parseBriefFile, serializeBrief } from "@/lib/briefFile";
+import { briefStrength } from "@/lib/briefStrength";
 import type { ImportedBrief } from "@/lib/importBrief";
 import { GOALS, PLATFORMS, type Goal, type Intake, type Platform } from "@/lib/types";
 
@@ -23,6 +24,7 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
     set("channels", has ? intake.channels.filter((c) => c !== id) : [...intake.channels, id]);
   };
 
+  const strength = briefStrength(intake);
   const [siteUrl, setSiteUrl] = useState(intake.website);
   const [importing, setImporting] = useState(false);
   const [importNote, setImportNote] = useState<{ ok: boolean; text: string; missing?: string[] } | null>(null);
@@ -93,6 +95,16 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
           The agent writes only from what you enter here. The more specific your facts, the better the strategy and the
           safer the drafts.
         </p>
+        <div className="strength" style={{ marginTop: 14 }}>
+          <div className="strength-head">
+            <span id="strength-label">Brief strength: {strength.label}</span>
+            <span aria-hidden="true">{strength.score}%</span>
+          </div>
+          <div className="meter" role="meter" aria-labelledby="strength-label" aria-valuemin={0} aria-valuemax={100} aria-valuenow={strength.score}>
+            <span style={{ width: `${strength.score}%` }} />
+          </div>
+          {strength.next && <p className="hint">{strength.next}</p>}
+        </div>
         <div className="field" style={{ marginTop: 14 }}>
           <label htmlFor="site-url">Start from your website</label>
           <p className="hint" id="site-url-hint">
@@ -271,6 +283,19 @@ export default function IntakeStep({ intake, onChange, onSubmit, onStartBlank, o
         <div className="field">
           <label htmlFor="tone">Tone and style rules</label>
           <input id="tone" type="text" value={intake.tone} onChange={(e) => set("tone", e.target.value)} />
+        </div>
+        <div className="field">
+          <label htmlFor="voiceSamples">Your voice (optional)</label>
+          <p className="hint">
+            Paste 3 to 5 of your own past posts, separated by a blank line. Drafts will copy how you write. Facts in
+            them are never reused.
+          </p>
+          <textarea
+            id="voiceSamples"
+            rows={5}
+            value={intake.voiceSamples}
+            onChange={(e) => set("voiceSamples", e.target.value)}
+          />
         </div>
       </div>
 

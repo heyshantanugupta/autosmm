@@ -34,6 +34,7 @@ export const PLATFORM_INFO: Record<Platform, PlatformInfo> = {
       { id: "poll-question", label: "Poll or question", description: "A question that invites replies from your audience." },
       { id: "carousel-outline", label: "Carousel outline", description: "Slide-by-slide outline for a document post.", multiPart: true },
       { id: "announcement", label: "Feature announcement", description: "What is new, who it helps, how to try it." },
+      { id: "text-post", label: "Plain post", description: "One idea in your own words, no special format." },
     ],
   },
   instagram: {

@@ -1,5 +1,5 @@
 import { DEFAULT_PROVIDER, getProvider, type ProviderId } from "./providers";
-import type { Draft, Intake, Strategy } from "./types";
+import type { Draft, Intake, PlanItem, ResultEntry, Review, Strategy } from "./types";
 
 export interface Settings {
   provider: ProviderId;
@@ -81,6 +81,10 @@ export interface Workspace {
   intake: Intake;
   strategy: Strategy | null;
   drafts: Draft[];
+  /** Added in v1.1.0. Older saved work does not have these. */
+  plan?: PlanItem[];
+  results?: ResultEntry[];
+  review?: Review | null;
 }
 
 /**

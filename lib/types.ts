@@ -45,6 +45,8 @@ export interface Intake {
   tone: string;
   /** Where the social accounts are today: followers, what works, what does not. */
   currentState: string;
+  /** A few of the user's own past posts, so drafts can match their voice. Style only, never a source of facts. */
+  voiceSamples: string;
 }
 
 export interface StrategyAudience {
@@ -108,6 +110,8 @@ export interface Draft {
   /** Facts from the intake that this draft relies on, as claimed by the model. */
   claimsUsed: string[];
   notes: string;
+  /** The checklist the user ticks before posting. */
+  approval?: Partial<Record<"claims" | "link" | "tone" | "read", boolean>>;
   /** The batch settings this draft was written with, so rewrites and checks use the same ones. */
   batch?: Batch;
   /** Filled in by our own checks after generation. */
@@ -117,4 +121,52 @@ export interface Draft {
 export interface DraftCheck {
   level: "ok" | "warn";
   message: string;
+}
+
+/** The four kinds of post a balanced plan mixes. */
+export type Pillar = "educate" | "proof" | "story" | "offer";
+
+export const PILLARS: { id: Pillar; label: string; hint: string }[] = [
+  { id: "educate", label: "Teach", hint: "Help people with something useful" },
+  { id: "story", label: "Story", hint: "Share what happened and why" },
+  { id: "proof", label: "Proof", hint: "Show real results or how it works" },
+  { id: "offer", label: "Offer", hint: "Tell people what is new and how to try it" },
+];
+
+/** One planned post: a day, a platform and what to write about. */
+export interface PlanItem {
+  id: string;
+  /** YYYY-MM-DD */
+  date: string;
+  platform: Platform;
+  postTypeId: string;
+  themeId: string;
+  pillar: Pillar;
+  topic: string;
+  /** The draft written for this slot, once it exists. */
+  draftId?: string;
+  posted?: boolean;
+}
+
+/** Numbers typed in by the user after a post has been live for a while. */
+export interface ResultEntry {
+  id: string;
+  date: string;
+  platform: Platform;
+  /** Short name for the post, so the list is readable. */
+  label: string;
+  themeId?: string;
+  postTypeId?: string;
+  planItemId?: string;
+  likes: number;
+  comments: number;
+  views: number;
+}
+
+export interface Review {
+  createdAt: string;
+  summary: string;
+  doMore: string[];
+  changeOrStop: string[];
+  tryNext: string[];
 }

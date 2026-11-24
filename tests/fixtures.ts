@@ -25,4 +25,5 @@ export const SAMPLE_BRIEF: Intake = {
   ].join("\n"),
   tone: "Direct, plain-spoken and specific. Sounds like a person, not a brand. No em dashes.",
   currentState: "LinkedIn page with a small following. Other channels are new and mostly empty.",
+  voiceSamples: "",
 };

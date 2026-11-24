@@ -3,7 +3,7 @@ import { GOALS, PLATFORMS, type Intake } from "./types.ts";
 const APP = "social-strategy-agent";
 export const MAX_BRIEF_FILE_BYTES = 200_000;
 
-const TEXT_FIELDS = ["productName", "oneLiner", "website", "audience", "facts", "proof", "newUpdates", "doNotSay", "tone", "currentState"] as const;
+const TEXT_FIELDS = ["productName", "oneLiner", "website", "audience", "facts", "proof", "newUpdates", "doNotSay", "tone", "currentState", "voiceSamples"] as const;
 
 /** The brief as a small JSON file. It holds only the brief: never an API key or any drafts. */
 export function serializeBrief(intake: Intake): string {

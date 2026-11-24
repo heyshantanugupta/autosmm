@@ -216,7 +216,7 @@ export default function PlatformStep({ intake, strategy, loading, error, onGener
           </button>
         )}
         <button type="button" className="btn quiet" onClick={onBack}>
-          Back to strategy
+          Back to this week
         </button>
       </div>
     </>

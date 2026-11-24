@@ -21,6 +21,10 @@ Describe your product once. Get a social media strategy, then ready-to-edit post
 > [!IMPORTANT]
 > **It never posts for you.** No auto-posting, no automated connection requests, no automated replies. You edit the draft, copy it, and publish it yourself.
 
+## Why AutoSMM
+
+You might be a great developer with a great idea and a great product. But if you cannot market it, reach the right audience or attract users, the product may not succeed. That is why AutoSMM exists. It helps you build a strategy and a base for your marketing plan, at least until you can afford to hire a professional marketing manager or director.
+
 ## Download the app (Windows and Mac)
 
 No Node.js, no terminal and no setup. AutoSMM is a normal desktop app, and everything stays on your own computer, saved work included.
@@ -58,9 +62,12 @@ Click a button, open the file you downloaded, and follow the prompts. Other opti
 ## What's new
 
 **v1.1.0**
-- **Start from your website:** paste your address and AutoSMM fills in a first draft of your brief. It only uses what the page says.
-- **Light and dark mode button** in the top right corner.
-- A cleaner README.
+- **Today view** with one next step, and tabs for Plan, Write, Reply and Results.
+- **30-day plan** and **write the week** in one click. CSV download included.
+- **Reply helper** for comments and messages, plus calm replies to negative reviews.
+- **Results log and weekly review** so you know what to do more of.
+- **Your voice**, **Repurpose**, **Hook lab**, **Hashtags and keywords**, and an **approval checklist** on every draft.
+- **Start from your website** and a **light and dark mode button**.
 
 See [every version](CHANGELOG.md).
 

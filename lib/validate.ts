@@ -40,6 +40,7 @@ export function parseIntake(raw: unknown): Intake {
     doNotSay: str(r.doNotSay, MAX_LONG, "Do-not-say rules"),
     tone: str(r.tone, 1000, "Tone"),
     currentState: str(r.currentState, MAX_LONG, "Current state"),
+    voiceSamples: str(r.voiceSamples, 3000, "Voice samples"),
   };
   return intake;
 }
@@ -77,7 +78,7 @@ export function parseDraftRequest(raw: unknown): {
   const batch: Batch = {
     tone: str(r.tone, 200, "Tone"),
     rules: str(r.rules, 1000, "Rules"),
-    feature: str(r.feature, 1000, "Feature"),
+    feature: str(r.feature, 4000, "Feature"),
   };
   const hasBatch = Boolean(batch.tone || batch.rules || batch.feature);
   return { platform, postTypeIds: ids, perType, instruction, batch: hasBatch ? batch : undefined };

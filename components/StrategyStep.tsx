@@ -179,7 +179,7 @@ export default function StrategyStep({ intake, strategy, onNext, onEditBrief, on
 
       <div className="row">
         <button type="button" className="btn" onClick={onNext}>
-          Choose a platform
+          Plan my 30 days
         </button>
         <button type="button" className="btn secondary" onClick={onRegenerate} disabled={loading}>
           {loading && <span className="spinner" aria-hidden="true" />}

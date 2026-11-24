@@ -10,11 +10,20 @@ import { IMAGE_TOOLS, buildImagePrompt } from "@/lib/imagePrompt";
 import { LINK_PLACEMENT, cleanSlug, trackedUrl } from "@/lib/tracking";
 import type { Draft, Intake, Strategy } from "@/lib/types";
 
+type ApprovalKey = "claims" | "link" | "tone" | "read";
+const APPROVAL_ITEMS: { key: ApprovalKey; label: string }[] = [
+  { key: "claims", label: "Claims and numbers are true" },
+  { key: "link", label: "Link works (or there is no link)" },
+  { key: "tone", label: "Sounds like me" },
+  { key: "read", label: "I read it out loud once" },
+];
+
 interface Props {
   intake: Intake;
   strategy: Strategy;
   drafts: Draft[];
   onChangeBody: (id: string, body: string) => void;
+  onApproval: (id: string, key: ApprovalKey, value: boolean) => void;
   onRemove: (id: string) => void;
   onRegenerate: (draft: Draft, instruction: string) => Promise<void>;
   onClear: () => void;
@@ -43,6 +52,7 @@ function DraftSheet({
   intake,
   themeName,
   onChangeBody,
+  onApproval,
   onRemove,
   onRegenerate,
 }: {
@@ -50,6 +60,7 @@ function DraftSheet({
   intake: Intake;
   themeName: string;
   onChangeBody: (id: string, body: string) => void;
+  onApproval: (id: string, key: ApprovalKey, value: boolean) => void;
   onRemove: (id: string) => void;
   onRegenerate: (draft: Draft, instruction: string) => Promise<void>;
 }) {
@@ -70,6 +81,10 @@ function DraftSheet({
     () => checkDraft({ body: draft.body, claimsUsed: draft.claimsUsed }, applyBatch(intake, draft.batch)),
     [draft.body, draft.claimsUsed, draft.batch, intake],
   );
+
+  const hasWarnings = checks.some((c) => c.level === "warn");
+  const doneCount = APPROVAL_ITEMS.filter((it) => draft.approval?.[it.key] || (it.key === "claims" && !hasWarnings)).length;
+  const ready = doneCount === APPROVAL_ITEMS.length;
 
   const copy = async () => {
     const ok = await copyText(draft.body);
@@ -129,7 +144,7 @@ function DraftSheet({
   };
 
   return (
-    <article className="sheet" data-p={draft.platform} aria-label={`${draft.postTypeLabel} draft`}>
+    <article className="sheet" id={`draft-${draft.id}`} data-p={draft.platform} aria-label={`${draft.postTypeLabel} draft`}>
       <aside className="margin" aria-label="Checks">
         <div>
           <h4>Checks</h4>
@@ -291,6 +306,23 @@ function DraftSheet({
           )}
         </div>
 
+        <fieldset className="approval">
+          <legend>Approve this post</legend>
+          {APPROVAL_ITEMS.map((it) => {
+            const auto = it.key === "claims" && !hasWarnings;
+            const on = Boolean(draft.approval?.[it.key]) || auto;
+            return (
+              <label key={it.key} className="approval-item">
+                <input type="checkbox" checked={on} disabled={auto} onChange={(e) => onApproval(draft.id, it.key, e.target.checked)} />
+                <span>{it.label}</span>
+              </label>
+            );
+          })}
+          <p className={`approval-state${ready ? " ready" : ""}`} role="status">
+            {ready ? "Ready to post" : `${APPROVAL_ITEMS.length - doneCount} to check`}
+          </p>
+        </fieldset>
+
         <div className="actions">
           <button type="button" className="btn small" onClick={copy}>
             {copied ? "Copied" : "Copy post"}
@@ -400,7 +432,7 @@ function toMarkdown(drafts: Draft[], intake: Intake): string {
   return parts.join("\n");
 }
 
-export default function DraftsStep({ intake, strategy, drafts, onChangeBody, onRemove, onRegenerate, onClear, onAddMore }: Props) {
+export default function DraftsStep({ intake, strategy, drafts, onChangeBody, onApproval, onRemove, onRegenerate, onClear, onAddMore }: Props) {
   const themeName = (id: string) => strategy.themes.find((t) => t.id === id)?.name ?? "";
 
   const groups = useMemo(() => {
@@ -457,6 +489,7 @@ export default function DraftsStep({ intake, strategy, drafts, onChangeBody, onR
                 intake={intake}
                 themeName={themeName(d.themeId)}
                 onChangeBody={onChangeBody}
+                onApproval={onApproval}
                 onRemove={onRemove}
                 onRegenerate={onRegenerate}
               />

@@ -1,13 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import DraftsStep from "@/components/DraftsStep";
+import CalendarView from "@/components/CalendarView";
 import IntakeStep from "@/components/IntakeStep";
 import PlatformStep from "@/components/PlatformStep";
-import ThemeToggle from "@/components/ThemeToggle";
+import ReplyView from "@/components/ReplyView";
+import ResultsView from "@/components/ResultsView";
 import SettingsPanel from "@/components/SettingsPanel";
 import StrategyStep from "@/components/StrategyStep";
-import { requestDrafts, requestImport, requestStrategy } from "@/lib/client";
+import SubNav from "@/components/SubNav";
+import ThemeToggle from "@/components/ThemeToggle";
+import TodayView from "@/components/TodayView";
+import WriteView from "@/components/WriteView";
+import { requestCalendar, requestDrafts, requestHashtags, requestHooks, requestImport, requestReply, requestReview, requestStrategy } from "@/lib/client";
+import { todayISO } from "@/lib/dates";
+import { weekAhead, type NextAction } from "@/lib/nextStep";
 import { getProvider } from "@/lib/providers";
 import { BLANK_INTAKE } from "@/lib/presets";
 import {
@@ -19,43 +26,38 @@ import {
   saveWorkspace,
   type Settings,
 } from "@/lib/storage";
-import type { Batch, Draft, Intake, Platform, Strategy } from "@/lib/types";
+import type { Batch, Draft, Intake, Platform, PlanItem, ResultEntry, Review, Strategy } from "@/lib/types";
 
-type Step = "intake" | "strategy" | "platform" | "drafts";
+type Tab = "today" | "plan" | "write" | "reply" | "results";
+type PlanTab = "brief" | "strategy" | "calendar";
 
-const STEPS: { id: Step; label: string; hint: string }[] = [
-  { id: "intake", label: "Brief", hint: "Describe your product" },
-  { id: "strategy", label: "Strategy", hint: "Review the plan" },
-  { id: "platform", label: "Platform", hint: "Pick channel and posts" },
-  { id: "drafts", label: "Drafts", hint: "Edit and copy" },
+const TABS: { id: Tab; label: string; hint: string }[] = [
+  { id: "today", label: "Today", hint: "What to do next" },
+  { id: "plan", label: "Plan", hint: "Brief, strategy, 30 days" },
+  { id: "write", label: "Write", hint: "This week's posts" },
+  { id: "reply", label: "Reply", hint: "Answer comments" },
+  { id: "results", label: "Results", hint: "What worked" },
 ];
 
-const ICONS: Record<Step | "check", React.ReactNode> = {
-  intake: (
+const ICONS: Record<Tab, React.ReactNode> = {
+  today: (
     <>
-      <path d="M6 3h6l4 4v10H6z" />
-      <path d="M12 3v4h4M8.5 11h5M8.5 14h5" />
+      <circle cx="10" cy="10" r="3.2" />
+      <path d="M10 2.8v1.9M10 15.3v1.9M2.8 10h1.9M15.3 10h1.9M4.9 4.9l1.3 1.3M13.8 13.8l1.3 1.3M15.1 4.9l-1.3 1.3M6.2 13.8l-1.3 1.3" />
     </>
   ),
-  strategy: (
+  plan: (
     <>
-      <circle cx="10" cy="10" r="6.5" />
-      <path d="M12.8 7.2 11 11l-3.8 1.8L9 9z" />
+      <rect x="3.5" y="4.5" width="13" height="12" rx="2" />
+      <path d="M3.5 8.5h13M7 3v3M13 3v3" />
     </>
   ),
-  platform: (
-    <>
-      <rect x="3.5" y="3.5" width="5.5" height="5.5" rx="1.5" />
-      <rect x="11" y="3.5" width="5.5" height="5.5" rx="1.5" />
-      <rect x="3.5" y="11" width="5.5" height="5.5" rx="1.5" />
-      <rect x="11" y="11" width="5.5" height="5.5" rx="1.5" />
-    </>
-  ),
-  drafts: <path d="M4 16l.8-3.4 8.8-8.8a1.6 1.6 0 0 1 2.3 0l.3.3a1.6 1.6 0 0 1 0 2.3L7.4 15.2zM12 5.5 14.5 8" />,
-  check: <path d="M5 10.5l3.2 3.2L15 6.8" />,
+  write: <path d="M4 16l.8-3.4 8.8-8.8a1.6 1.6 0 0 1 2.3 0l.3.3a1.6 1.6 0 0 1 0 2.3L7.4 15.2zM12 5.5 14.5 8" />,
+  reply: <path d="M4 5.5h12v7H9.5L6 16v-3.5H4z" />,
+  results: <path d="M4.5 16V10M9 16V5M13.5 16v-4.5M3 16.5h14" />,
 };
 
-function StepIcon({ name }: { name: Step | "check" }) {
+function TabIcon({ name }: { name: Tab }) {
   return (
     <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       {ICONS[name]}
@@ -63,29 +65,46 @@ function StepIcon({ name }: { name: Step | "check" }) {
   );
 }
 
+const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `r${Date.now()}${Math.random().toString(36).slice(2, 7)}`);
+const reviewHint = (r: Review | null) => (r ? [r.summary, ...r.doMore, ...r.changeOrStop].join(" ").slice(0, 800) : undefined);
+
 export default function Home() {
   const [ready, setReady] = useState(false);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [showSettings, setShowSettings] = useState(false);
 
-  const [step, setStep] = useState<Step>("intake");
+  const [tab, setTab] = useState<Tab>("today");
+  const [planTab, setPlanTab] = useState<PlanTab>("brief");
+  const [customWrite, setCustomWrite] = useState(false);
   const [intake, setIntake] = useState<Intake>(BLANK_INTAKE);
   const [strategy, setStrategy] = useState<Strategy | null>(null);
   const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [plan, setPlan] = useState<PlanItem[]>([]);
+  const [results, setResults] = useState<ResultEntry[]>([]);
+  const [review, setReview] = useState<Review | null>(null);
+  const [today, setToday] = useState("");
+  const [prefillItem, setPrefillItem] = useState<string | undefined>();
 
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState<string | null>(null);
+  const [reviewBusy, setReviewBusy] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Load saved state once, in the browser only.
   useEffect(() => {
     const s = loadSettings();
     setSettings(s);
+    setToday(todayISO());
     const w = loadWorkspace();
     if (w) {
       setIntake(w.intake ?? BLANK_INTAKE);
       setStrategy(w.strategy ?? null);
       setDrafts(w.drafts ?? []);
-      setStep(w.drafts?.length ? "drafts" : w.strategy ? "strategy" : "intake");
+      setPlan(w.plan ?? []);
+      setResults(w.results ?? []);
+      setReview(w.review ?? null);
+      if (w.strategy) setPlanTab(w.plan?.length ? "calendar" : "strategy");
     }
     if (!s.demo && getProvider(s.provider).needsKey && !s.apiKey) setShowSettings(true);
     setReady(true);
@@ -93,19 +112,19 @@ export default function Home() {
 
   useEffect(() => {
     if (!ready) return;
-    const isEmpty = !strategy && drafts.length === 0 && JSON.stringify(intake) === JSON.stringify(BLANK_INTAKE);
+    const isEmpty = !strategy && drafts.length === 0 && plan.length === 0 && results.length === 0 && JSON.stringify(intake) === JSON.stringify(BLANK_INTAKE);
     // Do not write an empty brief back to storage (this is what "Clear" relies on).
-    if (!isEmpty) saveWorkspace({ intake, strategy, drafts });
-  }, [ready, intake, strategy, drafts]);
+    if (!isEmpty) saveWorkspace({ intake, strategy, drafts, plan, results, review });
+  }, [ready, intake, strategy, drafts, plan, results, review]);
 
   const updateSettings = (next: Settings) => {
     setSettings(next);
     saveSettings(next);
   };
 
-  const goTo = useCallback((next: Step) => {
+  const goTab = useCallback((next: Tab) => {
     setError(null);
-    setStep(next);
+    setTab(next);
     window.scrollTo({ top: 0 });
   }, []);
 
@@ -113,18 +132,22 @@ export default function Home() {
   const hasAccess = settings.demo || !provider.needsKey || Boolean(settings.apiKey);
   const needsAccess = !hasAccess;
 
+  const requireAccess = (): boolean => {
+    if (!needsAccess) return true;
+    setShowSettings(true);
+    setError("Add an API key in Settings, or switch on demo mode.");
+    return false;
+  };
+
   const buildStrategy = async () => {
-    if (needsAccess) {
-      setShowSettings(true);
-      setError("Add an API key in Settings, or switch on demo mode.");
-      return;
-    }
+    if (!requireAccess()) return;
     setLoading(true);
     setError(null);
     try {
       const res = await requestStrategy(intake, settings);
       setStrategy(res.strategy);
-      goTo("strategy");
+      setPlanTab("strategy");
+      goTab("plan");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not build the strategy.");
     } finally {
@@ -132,13 +155,26 @@ export default function Home() {
     }
   };
 
-  const generateDrafts = async (args: { platform: Platform; postTypeIds: string[]; perType: number; instruction: string; batch: Batch }) => {
-    if (!strategy) return;
-    if (needsAccess) {
-      setShowSettings(true);
-      setError("Add an API key in Settings, or switch on demo mode.");
-      return;
+  const makePlan = async (opts?: { perWeek?: number; startDate?: string }) => {
+    if (!strategy || !requireAccess()) return;
+    setLoading(true);
+    setProgress("Planning your 30 days...");
+    setError(null);
+    try {
+      const res = await requestCalendar({ intake, strategy, startDate: opts?.startDate || today, perWeek: opts?.perWeek, review: reviewHint(review) }, settings);
+      setPlan(res.plan);
+      setPlanTab("calendar");
+      goTab("plan");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not make the plan.");
+    } finally {
+      setLoading(false);
+      setProgress(null);
     }
+  };
+
+  const generateDrafts = async (args: { platform: Platform; postTypeIds: string[]; perType: number; instruction: string; batch: Batch }) => {
+    if (!strategy || !requireAccess()) return;
     setLoading(true);
     setError(null);
     try {
@@ -155,11 +191,98 @@ export default function Home() {
         settings,
       );
       setDrafts((cur) => [...cur, ...res.drafts]);
-      goTo("drafts");
+      setCustomWrite(false);
+      goTab("write");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not write drafts.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  /** Write the draft for one planned post and attach it to that slot. */
+  const writeForItem = async (item: PlanItem) => {
+    if (!strategy) return;
+    const res = await requestDrafts(
+      { intake, strategy, platform: item.platform, postTypeIds: [item.postTypeId], perType: 1, instruction: `Topic for this post: ${item.topic}` },
+      settings,
+    );
+    const draft = res.drafts[0];
+    if (!draft) throw new Error("No draft came back. Try again.");
+    const attached: Draft = { ...draft, themeId: item.themeId };
+    setDrafts((cur) => [...cur, attached]);
+    setPlan((cur) => cur.map((p) => (p.id === item.id ? { ...p, draftId: attached.id } : p)));
+  };
+
+  const writeWeek = async () => {
+    if (!strategy || !requireAccess()) return;
+    const todo = weekAhead(plan, today).filter((i) => !i.draftId);
+    if (todo.length === 0) return;
+    setLoading(true);
+    setError(null);
+    let done = 0;
+    try {
+      for (const item of todo) {
+        setProgress(`Writing post ${done + 1} of ${todo.length}...`);
+        await writeForItem(item);
+        done++;
+      }
+      goTab("write");
+    } catch (e) {
+      const why = e instanceof Error ? e.message : "Something went wrong.";
+      setError(`Wrote ${done} of ${todo.length}. ${why} Press the button again to write the rest.`);
+      goTab("write");
+    } finally {
+      setLoading(false);
+      setProgress(null);
+    }
+  };
+
+  /** One idea or blog post becomes a post in each chosen format. The user's text counts as the source of facts. */
+  const repurpose = async (text: string, targets: string[]) => {
+    if (!strategy || !requireAccess()) return;
+    setLoading(true);
+    setError(null);
+    let done = 0;
+    try {
+      for (const t of targets) {
+        const [platform, postTypeId] = t.split(":") as [Platform, string];
+        setProgress(`Writing ${done + 1} of ${targets.length}...`);
+        const res = await requestDrafts(
+          {
+            intake,
+            strategy,
+            platform,
+            postTypeIds: [postTypeId],
+            perType: 1,
+            feature: text,
+            instruction: "Rewrite the pasted text for this format. Keep its message and facts. Do not add claims that are not in it.",
+          },
+          settings,
+        );
+        setDrafts((cur) => [...cur, ...res.drafts]);
+        done++;
+      }
+    } catch (e) {
+      setError(`Made ${done} of ${targets.length}. ${e instanceof Error ? e.message : "Something went wrong."}`);
+    } finally {
+      setLoading(false);
+      setProgress(null);
+    }
+  };
+
+  const writeOne = async (item: PlanItem) => {
+    if (!requireAccess()) return;
+    setLoading(true);
+    setProgress("Writing...");
+    setError(null);
+    try {
+      await writeForItem(item);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not write that post.");
+    } finally {
+      setLoading(false);
+      setProgress(null);
     }
   };
 
@@ -181,6 +304,31 @@ export default function Home() {
     const fresh = res.drafts[0];
     if (!fresh) throw new Error("No draft came back. Try again.");
     setDrafts((cur) => cur.map((d) => (d.id === draft.id ? fresh : d)));
+    setPlan((cur) => cur.map((p) => (p.draftId === draft.id ? { ...p, draftId: fresh.id } : p)));
+  };
+
+  const removeDraft = (id: string) => {
+    setDrafts((cur) => cur.filter((d) => d.id !== id));
+    setPlan((cur) => cur.map((p) => (p.draftId === id ? { ...p, draftId: undefined, posted: false } : p)));
+  };
+
+  const clearDrafts = () => {
+    setDrafts([]);
+    setPlan((cur) => cur.map((p) => ({ ...p, draftId: undefined, posted: false })));
+  };
+
+  const runReview = async () => {
+    if (!strategy || !requireAccess()) return;
+    setReviewBusy(true);
+    setReviewError(null);
+    try {
+      const res = await requestReview({ intake, strategy, entries: results }, settings);
+      setReview(res.review);
+    } catch (e) {
+      setReviewError(e instanceof Error ? e.message : "Could not review the results.");
+    } finally {
+      setReviewBusy(false);
+    }
   };
 
   const clearEverything = () => {
@@ -189,21 +337,50 @@ export default function Home() {
     setIntake(BLANK_INTAKE);
     setStrategy(null);
     setDrafts([]);
-    setStep("intake");
+    setPlan([]);
+    setResults([]);
+    setReview(null);
+    setTab("today");
+    setPlanTab("brief");
     setError(null);
   };
 
-  const hasStrategy = strategy !== null;
-  const reached: Record<Step, boolean> = { intake: true, strategy: hasStrategy, platform: hasStrategy, drafts: hasStrategy };
-  const doneSteps: Record<Step, boolean> = {
-    intake: hasStrategy,
-    strategy: hasStrategy && (step === "platform" || step === "drafts"),
-    platform: drafts.length > 0,
-    drafts: false,
+  const act = (action: NextAction) => {
+    switch (action) {
+      case "brief":
+        setPlanTab("brief");
+        return goTab("plan");
+      case "strategy":
+        return buildStrategy();
+      case "plan":
+      case "replan":
+        return makePlan();
+      case "write-week":
+        return writeWeek();
+      case "post-today": {
+        const item = plan.find((p) => p.date === today && !p.posted);
+        goTab("write");
+        if (item?.draftId) setTimeout(() => document.getElementById(`draft-${item.draftId}`)?.scrollIntoView({ block: "start" }), 50);
+        return;
+      }
+      case "log-results":
+        return goTab("results");
+      case "rest":
+        return goTab("reply");
+    }
+  };
+
+  const snapshot = { intake, strategy, plan, results, today };
+  const doneTabs: Record<Tab, boolean> = {
+    today: false,
+    plan: plan.length > 0,
+    write: plan.length > 0 && weekAhead(plan, today).every((i) => i.draftId) && weekAhead(plan, today).length > 0,
+    reply: false,
+    results: results.length > 0,
   };
 
   return (
-    <div className="app" data-step={step}>
+    <div className="app" data-step={tab}>
       <header className="topbar">
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
@@ -230,25 +407,17 @@ export default function Home() {
       </header>
 
       <div className="shell">
-        <nav className="rail" aria-label="Steps">
+        <nav className="rail tabs" aria-label="Sections">
           <ol>
-            {STEPS.map((s) => (
-              <li key={s.id} className={`step-${s.id}${doneSteps[s.id] ? " is-done" : ""}`}>
-                <button
-                  type="button"
-                  disabled={!reached[s.id]}
-                  aria-current={step === s.id ? "step" : undefined}
-                  onClick={() => goTo(s.id)}
-                >
+            {TABS.map((t) => (
+              <li key={t.id} className={`step-${t.id}${doneTabs[t.id] ? " is-done" : ""}`}>
+                <button type="button" aria-current={tab === t.id ? "page" : undefined} onClick={() => goTab(t.id)}>
                   <span className="node">
-                    <StepIcon name={doneSteps[s.id] && step !== s.id ? "check" : s.id} />
+                    <TabIcon name={t.id} />
                   </span>
                   <span className="step-text">
-                    <span className="step-label">
-                      {s.label}
-                      {doneSteps[s.id] && <span className="sr-only"> (done)</span>}
-                    </span>
-                    <span className="step-hint">{s.hint}</span>
+                    <span className="step-label">{t.label}</span>
+                    <span className="step-hint">{t.hint}</span>
                   </span>
                 </button>
               </li>
@@ -266,53 +435,160 @@ export default function Home() {
             />
           )}
 
-          {step === "intake" && (
-            <IntakeStep
-              intake={intake}
-              onChange={setIntake}
-              onSubmit={buildStrategy}
-              onStartBlank={() => setIntake(BLANK_INTAKE)}
-              onImport={(url) => requestImport(url, settings)}
+          {tab === "today" && (
+            <TodayView
+              snapshot={snapshot}
               loading={loading}
+              progress={progress}
               error={error}
+              onAct={act}
+              onGo={(t) => goTab(t)}
             />
           )}
 
-          {step === "strategy" && strategy && (
-            <StrategyStep
-              intake={intake}
-              strategy={strategy}
-              onNext={() => goTo("platform")}
-              onEditBrief={() => goTo("intake")}
-              onRegenerate={buildStrategy}
-              loading={loading}
-              error={error}
-            />
+          {tab === "plan" && (
+            <>
+              <SubNav
+                label="Plan sections"
+                value={planTab}
+                onChange={(v) => {
+                  setError(null);
+                  setPlanTab(v);
+                }}
+                options={[
+                  { id: "brief", label: "Brief" },
+                  { id: "strategy", label: "Strategy", disabled: !strategy },
+                  { id: "calendar", label: "30 days", disabled: !strategy },
+                ]}
+              />
+              {planTab === "brief" && (
+                <IntakeStep
+                  intake={intake}
+                  onChange={setIntake}
+                  onSubmit={buildStrategy}
+                  onStartBlank={() => setIntake(BLANK_INTAKE)}
+                  onImport={(url) => requestImport(url, settings)}
+                  loading={loading}
+                  error={error}
+                />
+              )}
+              {planTab === "strategy" && strategy && (
+                <StrategyStep
+                  intake={intake}
+                  strategy={strategy}
+                  onNext={() => (plan.length ? setPlanTab("calendar") : makePlan())}
+                  onEditBrief={() => setPlanTab("brief")}
+                  onRegenerate={buildStrategy}
+                  loading={loading}
+                  error={error}
+                />
+              )}
+              {planTab === "calendar" && strategy && (
+                <CalendarView
+                  plan={plan}
+                  strategy={strategy}
+                  today={today}
+                  loading={loading}
+                  error={error}
+                  onMake={(o) => makePlan(o)}
+                  onRemove={(id) => setPlan((cur) => cur.filter((p) => p.id !== id))}
+                />
+              )}
+            </>
           )}
 
-          {step === "platform" && strategy && (
+          {tab === "write" && !strategy && (
+            <section className="next-card">
+              <h2>Build your strategy first</h2>
+              <p>AutoSMM writes from your strategy, so it needs one before it can write posts.</p>
+              <div className="row">
+                <button type="button" className="btn" onClick={() => act("brief")}>
+                  Go to your brief
+                </button>
+              </div>
+            </section>
+          )}
+          {tab === "write" && strategy && customWrite && (
             <PlatformStep
               intake={intake}
               strategy={strategy}
               loading={loading}
               error={error}
               onGenerate={generateDrafts}
-              onBack={() => goTo("strategy")}
+              onBack={() => setCustomWrite(false)}
               hasDrafts={drafts.length > 0}
-              onViewDrafts={() => goTo("drafts")}
+              onViewDrafts={() => setCustomWrite(false)}
+            />
+          )}
+          {tab === "write" && strategy && !customWrite && (
+            <WriteView
+              intake={intake}
+              strategy={strategy}
+              plan={plan}
+              drafts={drafts}
+              today={today}
+              loading={loading}
+              progress={progress}
+              error={error}
+              onWriteWeek={writeWeek}
+              onWriteOne={writeOne}
+              onTogglePosted={(id, posted) => setPlan((cur) => cur.map((p) => (p.id === id ? { ...p, posted } : p)))}
+              onLogResults={(id) => {
+                setPrefillItem(id);
+                goTab("results");
+              }}
+              onChangeBody={(id, body) => setDrafts((cur) => cur.map((d) => (d.id === id ? { ...d, body } : d)))}
+              onApproval={(id, key, value) =>
+                setDrafts((cur) => cur.map((d) => (d.id === id ? { ...d, approval: { ...d.approval, [key]: value } } : d)))
+              }
+              onRemove={removeDraft}
+              onRegenerate={regenerate}
+              onClear={clearDrafts}
+              onAddMore={() => setCustomWrite(true)}
+              onMakePlan={() => makePlan()}
+              onRepurpose={repurpose}
+              onHooks={async (topic) => {
+                if (needsAccess) {
+                  setShowSettings(true);
+                  throw new Error("Add an API key in Settings, or switch on demo mode.");
+                }
+                return (await requestHooks({ intake, topic }, settings)).hooks;
+              }}
+              onHashtags={async (topic, platforms) => {
+                if (needsAccess) {
+                  setShowSettings(true);
+                  throw new Error("Add an API key in Settings, or switch on demo mode.");
+                }
+                return (await requestHashtags({ intake, topic, platforms }, settings)).sets;
+              }}
             />
           )}
 
-          {step === "drafts" && strategy && (
-            <DraftsStep
-              intake={intake}
+          {tab === "reply" && (
+            <ReplyView
+              onReply={async (message, platform, kind) => {
+                if (needsAccess) {
+                  setShowSettings(true);
+                  throw new Error("Add an API key in Settings, or switch on demo mode.");
+                }
+                return requestReply({ intake, message, platform, kind }, settings);
+              }}
+            />
+          )}
+
+          {tab === "results" && (
+            <ResultsView
               strategy={strategy}
-              drafts={drafts}
-              onChangeBody={(id, body) => setDrafts((cur) => cur.map((d) => (d.id === id ? { ...d, body } : d)))}
-              onRemove={(id) => setDrafts((cur) => cur.filter((d) => d.id !== id))}
-              onRegenerate={regenerate}
-              onClear={() => setDrafts([])}
-              onAddMore={() => goTo("platform")}
+              plan={plan}
+              results={results}
+              review={review}
+              today={today}
+              prefillItemId={prefillItem}
+              reviewBusy={reviewBusy}
+              reviewError={reviewError}
+              onAdd={(e) => setResults((cur) => [...cur, { ...e, id: newId() }])}
+              onRemove={(id) => setResults((cur) => cur.filter((r) => r.id !== id))}
+              onReview={runReview}
             />
           )}
         </main>
