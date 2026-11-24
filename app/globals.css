@@ -1418,6 +1418,13 @@ input[type="radio"] {
 .grid-3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+.sheet.reply-card {
+  display: block;
+  padding: 18px 22px 20px;
+}
+.sheet.reply-card > * + * {
+  margin-top: 12px;
+}
 .reply-card textarea {
   width: 100%;
 }
@@ -1472,6 +1479,7 @@ input[type="radio"] {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
+  margin: 20px 0 0;
   margin: 0;
 }
 .tile {

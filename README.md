@@ -59,6 +59,18 @@ Click a button, open the file you downloaded, and follow the prompts. Other opti
 >
 > Do not click "Move to Trash". If you did, download the app again.
 
+## What it looks like
+
+These screenshots use a made-up habit tracker called Brightloop, with the app in demo mode.
+
+| | |
+|---|---|
+| ![Brief](docs/images/brief.png)<br>**Describe your product once.** Paste your website or type a few lines. | ![Strategy](docs/images/strategy.png)<br>**Get a strategy.** Who to talk to, where, and about what. |
+| ![30-day plan](docs/images/plan.png)<br>**A 30-day plan.** A balanced post for each posting day. | ![Write the week](docs/images/write.png)<br>**Write the week.** One click drafts the next 7 days. |
+| ![A draft](docs/images/draft.png)<br>**Check before you post.** Claim checks and a checklist on every draft. | ![Hook lab](docs/images/hooks.png)<br>**Hook lab.** Ten opening lines for any post. |
+| ![Reply helper](docs/images/reply.png)<br>**Reply helper.** Calm replies to comments and negative reviews. | ![Results](docs/images/results.png)<br>**Results and review.** See what to do more of. |
+| ![Projects](docs/images/projects.png)<br>**Projects.** A separate plan for each product. | ![Dark mode](docs/images/today-dark.png)<br>**Light and dark mode.** |
+
 ## What's new
 
 **v1.2.0**
