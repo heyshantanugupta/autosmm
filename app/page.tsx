@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import CalendarView from "@/components/CalendarView";
 import IntakeStep from "@/components/IntakeStep";
 import PlatformStep from "@/components/PlatformStep";
+import ProjectMenu from "@/components/ProjectMenu";
 import ReplyView from "@/components/ReplyView";
 import ResultsView from "@/components/ResultsView";
 import SettingsPanel from "@/components/SettingsPanel";
@@ -14,6 +15,9 @@ import TodayView from "@/components/TodayView";
 import WriteView from "@/components/WriteView";
 import { requestCalendar, requestDrafts, requestHashtags, requestHooks, requestImport, requestReply, requestReview, requestStrategy } from "@/lib/client";
 import { todayISO } from "@/lib/dates";
+import { projectFileName, parseProjectFile, serializeProject } from "@/lib/projectFile";
+import { addProject, makeMeta, NEW_NAME, removeProject, renameProject, syncAutoName, type ProjectIndex } from "@/lib/projects";
+import { cleanWorkspace } from "@/lib/workspaceClean";
 import { weekAhead, type NextAction } from "@/lib/nextStep";
 import { getProvider } from "@/lib/providers";
 import { BLANK_INTAKE } from "@/lib/presets";
@@ -21,11 +25,14 @@ import {
   DEFAULT_SETTINGS,
   clearAllStoredData,
   loadSettings,
-  loadWorkspace,
-  removeWorkspace,
+  deleteProjectData,
+  loadProject,
+  loadProjects,
+  saveIndex,
+  saveProject,
   saveSettings,
-  saveWorkspace,
   type Settings,
+  type Workspace,
 } from "@/lib/storage";
 import type { Batch, Draft, Intake, Platform, PlanItem, ResultEntry, Review, Strategy } from "@/lib/types";
 
@@ -83,6 +90,7 @@ export default function Home() {
   const [plan, setPlan] = useState<PlanItem[]>([]);
   const [results, setResults] = useState<ResultEntry[]>([]);
   const [review, setReview] = useState<Review | null>(null);
+  const [index, setIndex] = useState<ProjectIndex | null>(null);
   const [today, setToday] = useState("");
   const [prefillItem, setPrefillItem] = useState<string | undefined>();
 
@@ -92,31 +100,43 @@ export default function Home() {
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  /** Put a project's saved work on screen. */
+  function applyWorkspace(w: Workspace, goToday = true) {
+    setIntake(w.intake);
+    setStrategy(w.strategy);
+    setDrafts(w.drafts);
+    setPlan(w.plan ?? []);
+    setResults(w.results ?? []);
+    setReview(w.review ?? null);
+    setPlanTab(w.strategy ? (w.plan?.length ? "calendar" : "strategy") : "brief");
+    setCustomWrite(false);
+    setPrefillItem(undefined);
+    setError(null);
+    if (goToday) setTab("today");
+  }
+
   // Load saved state once, in the browser only.
   useEffect(() => {
     const s = loadSettings();
     setSettings(s);
     setToday(todayISO());
-    const w = loadWorkspace();
-    if (w) {
-      setIntake(w.intake ?? BLANK_INTAKE);
-      setStrategy(w.strategy ?? null);
-      setDrafts(w.drafts ?? []);
-      setPlan(w.plan ?? []);
-      setResults(w.results ?? []);
-      setReview(w.review ?? null);
-      if (w.strategy) setPlanTab(w.plan?.length ? "calendar" : "strategy");
-    }
+    const { index: idx, workspace: w } = loadProjects();
+    setIndex(idx);
+    applyWorkspace(w, false);
     if (!s.demo && getProvider(s.provider).needsKey && !s.apiKey) setShowSettings(true);
     setReady(true);
   }, []);
 
+  // Save the open project on every change. A project that has not been renamed follows the product name.
   useEffect(() => {
-    if (!ready) return;
-    const isEmpty = !strategy && drafts.length === 0 && plan.length === 0 && results.length === 0 && JSON.stringify(intake) === JSON.stringify(BLANK_INTAKE);
-    // Do not write an empty brief back to storage (this is what "Clear" relies on).
-    if (!isEmpty) saveWorkspace({ intake, strategy, drafts, plan, results, review });
-  }, [ready, intake, strategy, drafts, plan, results, review]);
+    if (!ready || !index) return;
+    saveProject(index.activeId, { intake, strategy, drafts, plan, results, review });
+    const next = syncAutoName(index, index.activeId, intake.productName);
+    if (next !== index) {
+      setIndex(next);
+      saveIndex(next);
+    }
+  }, [ready, index, intake, strategy, drafts, plan, results, review]);
 
   const updateSettings = (next: Settings) => {
     setSettings(next);
@@ -332,32 +352,96 @@ export default function Home() {
     }
   };
 
-  const clearEverything = () => {
-    clearAllStoredData();
-    setSettings(DEFAULT_SETTINGS);
-    setIntake(BLANK_INTAKE);
-    setStrategy(null);
-    setDrafts([]);
-    setPlan([]);
-    setResults([]);
-    setReview(null);
-    setTab("today");
-    setPlanTab("brief");
-    setError(null);
+  const currentWorkspace = (): Workspace => ({ intake, strategy, drafts, plan, results, review });
+
+  /** Save the open project, then open another. */
+  const openProject = (idx: ProjectIndex, w: Workspace, tabAfter: Tab = "today") => {
+    setIndex(idx);
+    saveIndex(idx);
+    applyWorkspace(w, false);
+    setTab(tabAfter);
+    window.scrollTo({ top: 0 });
   };
 
-  /** Clear the saved work but keep the API key and settings. */
-  const startNew = () => {
-    setIntake(BLANK_INTAKE);
-    setStrategy(null);
-    setDrafts([]);
-    setPlan([]);
-    setResults([]);
-    setReview(null);
+  const switchProject = (id: string) => {
+    if (!index || id === index.activeId) return;
+    saveProject(index.activeId, currentWorkspace());
+    openProject({ ...index, activeId: id }, loadProject(id) ?? cleanWorkspace({}));
+  };
+
+  const newProject = () => {
+    if (!index) return;
+    saveProject(index.activeId, currentWorkspace());
+    const meta = makeMeta(NEW_NAME, true, index);
+    const blank = cleanWorkspace({});
+    saveProject(meta.id, blank);
+    openProject(addProject(index, meta), blank, "plan");
+  };
+
+  const duplicateProject = () => {
+    if (!index) return;
+    const here = index.projects.find((p) => p.id === index.activeId);
+    const meta = makeMeta(`${here?.name ?? NEW_NAME} copy`, false, index);
+    const copy = cleanWorkspace(JSON.parse(JSON.stringify(currentWorkspace())));
+    saveProject(index.activeId, currentWorkspace());
+    saveProject(meta.id, copy);
+    openProject(addProject(index, meta), copy);
+  };
+
+  const renameActive = (name: string) => {
+    if (!index) return;
+    const next = renameProject(index, index.activeId, name);
+    setIndex(next);
+    saveIndex(next);
+  };
+
+  const deleteActive = () => {
+    if (!index) return;
+    const gone = index.activeId;
+    deleteProjectData(gone);
+    let next = removeProject(index, gone);
+    if (next.projects.length === 0) {
+      const meta = makeMeta("My first project", true);
+      saveProject(meta.id, cleanWorkspace({}));
+      next = { activeId: meta.id, projects: [meta] };
+    }
+    openProject(next, loadProject(next.activeId) ?? cleanWorkspace({}));
+  };
+
+  const exportActive = () => {
+    if (!index) return;
+    const name = index.projects.find((p) => p.id === index.activeId)?.name ?? "project";
+    const blob = new Blob([serializeProject(name, currentWorkspace())], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = projectFileName(name);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  /** Returns an error message, or null when the project was imported and opened. */
+  const importProject = async (file: File): Promise<string | null> => {
+    if (!index) return "Not ready yet. Try again in a moment.";
+    const res = parseProjectFile(await file.text());
+    if (!res.ok) return res.error;
+    saveProject(index.activeId, currentWorkspace());
+    const meta = makeMeta(res.name, false, index);
+    saveProject(meta.id, res.workspace);
+    openProject(addProject(index, meta), res.workspace);
+    return null;
+  };
+
+  const clearEverything = () => {
+    clearAllStoredData();
+    const meta = makeMeta("My first project", true);
+    setIndex({ activeId: meta.id, projects: [meta] });
+    setSettings(DEFAULT_SETTINGS);
+    applyWorkspace(cleanWorkspace({}), false);
+    setTab("today");
     setPlanTab("brief");
-    setError(null);
-    removeWorkspace();
-    setTab("plan");
   };
 
   const act = (action: NextAction) => {
@@ -409,6 +493,18 @@ export default function Home() {
           </span>
         </div>
         <div className="row">
+          {ready && index && (
+            <ProjectMenu
+              index={index}
+              onSwitch={switchProject}
+              onNew={newProject}
+              onRename={renameActive}
+              onDuplicate={duplicateProject}
+              onExport={exportActive}
+              onImport={importProject}
+              onDelete={deleteActive}
+            />
+          )}
           {ready && (
             <span className={`mode-pill ${settings.demo ? "demo" : hasAccess ? "live" : ""}`}>
               {settings.demo ? "Demo mode" : hasAccess ? `Using ${provider.label}` : "No API key yet"}
@@ -458,7 +554,7 @@ export default function Home() {
               error={error}
               onAct={act}
               onGo={(t) => goTab(t)}
-              onStartNew={startNew}
+              onStartNew={newProject}
             />
           )}
 

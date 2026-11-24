@@ -168,3 +168,71 @@ test("voice samples go into the prompt as style only", () => {
   assert.ok(p.includes("Short. Plain. Done.") && /never take facts/i.test(p));
   assert.equal(voiceBlock("  "), "");
 });
+
+import { addProject, cleanIndex, makeMeta, removeProject, renameProject, syncAutoName, uniqueName } from "../lib/projects.ts";
+import { parseProjectFile, projectFileName, serializeProject } from "../lib/projectFile.ts";
+import { cleanWorkspace } from "../lib/workspaceClean.ts";
+
+test("project names stay unique", () => {
+  assert.equal(uniqueName("Brightloop", []), "Brightloop");
+  assert.equal(uniqueName("brightloop", ["Brightloop"]), "brightloop 2");
+  assert.equal(uniqueName("Brightloop", ["Brightloop", "Brightloop 2"]), "Brightloop 3");
+  assert.equal(uniqueName("   ", []), "New project");
+});
+
+test("auto names follow the product until renamed", () => {
+  const a = makeMeta("New project", true);
+  let idx = { activeId: a.id, projects: [a] };
+  idx = syncAutoName(idx, a.id, "Brightloop");
+  assert.equal(idx.projects[0].name, "Brightloop");
+  assert.equal(syncAutoName(idx, a.id, "Brightloop"), idx);
+  idx = renameProject(idx, a.id, "Habit app");
+  idx = syncAutoName(idx, a.id, "Other");
+  assert.equal(idx.projects[0].name, "Habit app");
+});
+
+test("adding and removing projects keeps a valid active one", () => {
+  const a = makeMeta("A", true);
+  let idx = { activeId: a.id, projects: [a] };
+  const b = makeMeta("B", true, idx);
+  idx = addProject(idx, b);
+  assert.equal(idx.activeId, b.id);
+  idx = removeProject(idx, b.id);
+  assert.equal(idx.activeId, a.id);
+  idx = removeProject(idx, a.id);
+  assert.equal(idx.projects.length, 0);
+});
+
+test("a damaged project list is repaired or rejected", () => {
+  assert.equal(cleanIndex(null), null);
+  assert.equal(cleanIndex({ projects: [] }), null);
+  const i = cleanIndex({ activeId: "gone", projects: [{ id: "p1", name: "One" }, { id: "p1", name: "Dup" }, { id: "../x", name: "Bad" }] });
+  assert.equal(i?.projects.length, 1);
+  assert.equal(i?.activeId, "p1");
+});
+
+test("old saved work without newer fields loads cleanly", () => {
+  const w = cleanWorkspace({ intake: { productName: "Old", tone: "" }, strategy: null, drafts: [] });
+  assert.equal(w.intake.voiceSamples, "");
+  assert.deepEqual(w.plan, []);
+  assert.equal(w.review, null);
+});
+
+test("project file round trip, and bad files are refused", () => {
+  const ws = cleanWorkspace({ intake: SAMPLE_BRIEF, plan: [{ id: "a", date: "2026-11-24", platform: "linkedin", topic: "t", postTypeId: "x", themeId: "y", pillar: "educate" }] });
+  const text = serializeProject("Brightloop", ws);
+  assert.ok(!/api.?key/i.test(text));
+  const back = parseProjectFile(text);
+  assert.ok(back.ok && back.name === "Brightloop" && back.workspace.plan?.length === 1 && back.workspace.intake.productName === SAMPLE_BRIEF.productName);
+  assert.equal(parseProjectFile("{not json").ok, false);
+  assert.equal(parseProjectFile(JSON.stringify({ app: "autosmm", kind: "brief" })).ok, false);
+  assert.equal(projectFileName("Habit App!"), "habit-app-project.json");
+});
+
+test("imported junk cannot break the app", () => {
+  const w = cleanWorkspace({ intake: { productName: 5, channels: ["linkedin", "nope"] }, drafts: [{ id: 1 }, { id: "d", body: "b", platform: "x" }], plan: "no", results: [null] });
+  assert.equal(w.intake.productName, "");
+  assert.deepEqual(w.intake.channels, ["linkedin"]);
+  assert.equal(w.drafts.length, 1);
+  assert.deepEqual(w.plan, []);
+});

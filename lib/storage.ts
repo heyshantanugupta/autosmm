@@ -1,6 +1,6 @@
 import { DEFAULT_PROVIDER, getProvider, type ProviderId } from "./providers";
-import type { Draft, Intake, PlanItem, ResultEntry, Review, Strategy } from "./types";
-import { BLANK_INTAKE } from "./presets";
+import { cleanIndex, FIRST_NAME, makeMeta, type ProjectIndex } from "./projects";
+import { cleanWorkspace, type Workspace } from "./workspaceClean";
 
 export interface Settings {
   provider: ProviderId;
@@ -78,52 +78,83 @@ export function saveSettings(s: Settings) {
   write(window.localStorage, PREFS_KEY, JSON.stringify(prefs));
 }
 
-export interface Workspace {
-  intake: Intake;
-  strategy: Strategy | null;
-  drafts: Draft[];
-  /** Added in v1.1.0. Older saved work does not have these. */
-  plan?: PlanItem[];
-  results?: ResultEntry[];
-  review?: Review | null;
-}
+export type { Workspace } from "./workspaceClean";
 
-/**
- * Strategies saved by an earlier version could contain the text "[object Object]" where a model
- * had returned objects instead of strings. Drop those lines so old saved work still opens cleanly.
- */
-function cleanStrategy(s: Strategy | null): Strategy | null {
-  if (!s) return s;
-  const keep = (list: unknown) =>
-    Array.isArray(list) ? list.filter((x): x is string => typeof x === "string" && !x.includes("[object Object]")) : [];
-  return { ...s, measurement: keep(s.measurement), risks: keep(s.risks), gaps: keep(s.gaps) };
-}
+const INDEX_KEY = "ssa.projects";
+const projectKey = (id: string) => `ssa.project.${id}`;
 
-export function loadWorkspace(): Workspace | null {
+export function loadProject(id: string): Workspace | null {
   if (typeof window === "undefined") return null;
-  const raw = read(window.localStorage, WORKSPACE_KEY);
+  const raw = read(window.localStorage, projectKey(id));
   if (!raw) return null;
   try {
-    const w = JSON.parse(raw) as Workspace;
-    // Work saved by an older version may lack newer fields, so start from a blank brief and overlay it.
-    return { ...w, intake: { ...BLANK_INTAKE, ...(w.intake ?? {}) }, strategy: cleanStrategy(w.strategy ?? null) };
+    return cleanWorkspace(JSON.parse(raw));
   } catch {
     return null;
   }
 }
 
-export function saveWorkspace(w: Workspace) {
+export function saveProject(id: string, w: Workspace) {
   if (typeof window === "undefined") return;
-  write(window.localStorage, WORKSPACE_KEY, JSON.stringify(w));
+  write(window.localStorage, projectKey(id), JSON.stringify(w));
 }
 
-export function removeWorkspace() {
+export function deleteProjectData(id: string) {
   if (typeof window === "undefined") return;
+  remove(window.localStorage, projectKey(id));
+}
+
+export function saveIndex(index: ProjectIndex) {
+  if (typeof window === "undefined") return;
+  write(window.localStorage, INDEX_KEY, JSON.stringify(index));
+}
+
+/**
+ * Load the project list and the active project. Work saved by v1.1.x and earlier lived in a single
+ * slot: it becomes the first project, so nothing is lost on update.
+ */
+export function loadProjects(): { index: ProjectIndex; workspace: Workspace } {
+  const blank = (): Workspace => cleanWorkspace({});
+  if (typeof window === "undefined") {
+    const meta = makeMeta(FIRST_NAME, true);
+    return { index: { activeId: meta.id, projects: [meta] }, workspace: blank() };
+  }
+  let index: ProjectIndex | null = null;
+  try {
+    const raw = read(window.localStorage, INDEX_KEY);
+    index = raw ? cleanIndex(JSON.parse(raw)) : null;
+  } catch {
+    index = null;
+  }
+  if (index) return { index, workspace: loadProject(index.activeId) ?? blank() };
+
+  let workspace = blank();
+  const legacyRaw = read(window.localStorage, WORKSPACE_KEY);
+  if (legacyRaw) {
+    try {
+      workspace = cleanWorkspace(JSON.parse(legacyRaw));
+    } catch {
+      /* unreadable old save: start empty */
+    }
+  }
+  const meta = makeMeta(workspace.intake.productName || FIRST_NAME, true);
+  index = { activeId: meta.id, projects: [meta] };
+  saveIndex(index);
+  saveProject(meta.id, workspace);
   remove(window.localStorage, WORKSPACE_KEY);
+  return { index, workspace };
 }
 
 export function clearAllStoredData() {
   if (typeof window === "undefined") return;
+  try {
+    const raw = read(window.localStorage, INDEX_KEY);
+    const index = raw ? cleanIndex(JSON.parse(raw)) : null;
+    for (const p of index?.projects ?? []) remove(window.localStorage, projectKey(p.id));
+  } catch {
+    /* ignore */
+  }
+  remove(window.localStorage, INDEX_KEY);
   remove(window.localStorage, WORKSPACE_KEY);
   remove(window.localStorage, PREFS_KEY);
   remove(window.sessionStorage, SESSION_KEY);

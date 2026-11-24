@@ -15,6 +15,18 @@ export function briefFileName(intake: Intake): string {
   return `${slug || "my"}-brief.json`;
 }
 
+/** Keep only known brief fields, with safe types. Anything missing becomes empty. */
+export function sanitizeIntake(b: Record<string, unknown>): Intake {
+  const intake = {} as Record<string, unknown>;
+  for (const key of TEXT_FIELDS) {
+    const v = b[key];
+    intake[key] = typeof v === "string" ? v : "";
+  }
+  intake.goal = GOALS.find((g) => g.id === b.goal)?.id ?? "awareness";
+  intake.channels = (Array.isArray(b.channels) ? b.channels : []).filter((c) => PLATFORMS.some((p) => p.id === c));
+  return intake as unknown as Intake;
+}
+
 export type BriefResult = { ok: true; intake: Intake } | { ok: false; error: string };
 
 export function parseBriefFile(text: string): BriefResult {
@@ -29,13 +41,5 @@ export function parseBriefFile(text: string): BriefResult {
   if (!root || typeof root !== "object" || root.app !== APP || !root.brief || typeof root.brief !== "object") {
     return { ok: false, error: "That file is not a saved brief. Pick a .json file saved from this app." };
   }
-  const b = root.brief as Record<string, unknown>;
-  const intake = {} as Record<string, unknown>;
-  for (const key of TEXT_FIELDS) {
-    const v = b[key];
-    intake[key] = typeof v === "string" ? v : "";
-  }
-  intake.goal = GOALS.find((g) => g.id === b.goal)?.id ?? "awareness";
-  intake.channels = (Array.isArray(b.channels) ? b.channels : []).filter((c) => PLATFORMS.some((p) => p.id === c));
-  return { ok: true, intake: intake as unknown as Intake };
+  return { ok: true, intake: sanitizeIntake(root.brief as Record<string, unknown>) };
 }

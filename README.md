@@ -61,6 +61,10 @@ Click a button, open the file you downloaded, and follow the prompts. Other opti
 
 ## What's new
 
+**v1.2.0**
+- **Projects:** a separate brief, plan and drafts for each product, with a menu to switch, rename, duplicate and delete.
+- **Export and import** a project as a file, for backups or another computer.
+
 **v1.1.0**
 - **Today view** with one next step, and tabs for Plan, Write, Reply and Results.
 - **30-day plan** and **write the week** in one click. CSV download included.

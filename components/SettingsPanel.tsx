@@ -197,7 +197,7 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
           Done
         </button>
         <button type="button" className="btn quiet" onClick={onClearData}>
-          Clear saved brief, drafts and key
+          Clear all projects and my key
         </button>
       </div>
     </section>

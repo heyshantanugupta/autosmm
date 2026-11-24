@@ -2,6 +2,16 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.0
+
+- **Projects.** Keep a separate brief, strategy, plan, drafts and results for each product, like save slots. Use the project menu at the top to switch, start a new project, rename, duplicate or delete.
+- **Export and import.** Save a project to a file as a backup or to move it to another computer, and load it again later. Files never contain your API key.
+- Work saved by v1.1.x becomes your first project automatically.
+- "Start a new project" on the Today screen no longer wipes your work.
+- Fixed a crash when clearing the tone field on work saved by an older version.
+- The checklist before posting now explains each point.
+- Today shows the date and a welcome back line.
+
 ## v1.1.0
 
 AutoSMM now has a home screen and four tabs: Today, Plan, Write, Reply and Results.

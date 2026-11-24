@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import PlanRow from "./PlanRow";
 import { formatDayLong } from "@/lib/dates";
 import { greeting } from "@/lib/greeting";
@@ -17,7 +16,6 @@ interface Props {
 }
 
 export default function TodayView({ snapshot, loading, progress, error, onAct, onGo, onStartNew }: Props) {
-  const [confirming, setConfirming] = useState(false);
   const step = nextStep(snapshot);
   const week = weekAhead(snapshot.plan, snapshot.today);
   const themeName = (id: string) => snapshot.strategy?.themes.find((t) => t.id === id)?.name ?? "";
@@ -51,34 +49,11 @@ export default function TodayView({ snapshot, loading, progress, error, onAct, o
             {loading ? progress ?? "Working..." : step.button}
           </button>
           {hasWork && (
-            <button type="button" className="btn secondary" onClick={() => setConfirming(true)} disabled={loading}>
-              Start something new
+            <button type="button" className="btn secondary" onClick={onStartNew} disabled={loading}>
+              Start a new project
             </button>
           )}
         </div>
-        {confirming && (
-          <div className="notice warn" role="alertdialog" aria-label="Start something new">
-            <p>
-              This clears your brief, strategy, plan, drafts and results from this computer. To keep your brief, save it
-              first with "Save brief" on the Plan tab. Your API key and settings stay.
-            </p>
-            <div className="row">
-              <button
-                type="button"
-                className="btn small"
-                onClick={() => {
-                  setConfirming(false);
-                  onStartNew();
-                }}
-              >
-                Yes, start new
-              </button>
-              <button type="button" className="btn quiet small" onClick={() => setConfirming(false)}>
-                Keep my work
-              </button>
-            </div>
-          </div>
-        )}
         {error && <p className="error" role="alert">{error}</p>}
       </section>
 
