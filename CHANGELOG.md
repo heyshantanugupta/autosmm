@@ -2,6 +2,12 @@
 
 The newest version is first. Each version here matches a release on the [Releases page](https://github.com/heyshantanugupta/autosmm/releases).
 
+## v1.2.4
+
+- **Upload your logo.** Add it once in the Brand look section. It stays in this browser, one per project, and is never sent anywhere. Brand colors are filled in from it if you left them empty.
+- **No logo yet?** The same section gives a ready prompt to make one in Gemini or ChatGPT, built from your product name, what it does, your audience, colors and style.
+- **Add your logo and watermark to a picture.** On each post, after the image tool makes the picture, choose the file and download it back with your real logo and watermark in place. Image tools often misspell or redraw logos, so this step does it for them.
+
 ## v1.2.3
 
 - **Update from inside the app (Windows).** When a new version is out, the banner has an Update now button. It downloads the update, then asks before closing AutoSMM to install it and open the new version. Your work stays saved. This starts with v1.2.3, so the update after it is the first one that installs itself.
