@@ -1420,10 +1420,14 @@ input[type="radio"] {
 }
 .sheet.reply-card {
   display: block;
-  padding: 18px 22px 20px;
+  padding: 26px 28px 26px;
 }
 .sheet.reply-card > * + * {
-  margin-top: 12px;
+  margin-top: 14px;
+}
+.drafts-list:has(.reply-card) {
+  display: grid;
+  gap: 22px;
 }
 .reply-card textarea {
   width: 100%;
@@ -1602,3 +1606,4 @@ input[type="radio"] {
 @media (max-width: 760px) {
   .project-panel { position: fixed; left: 16px; right: 16px; top: 64px; width: auto; }
 }
+.notice + .drafts-list { margin-top: 18px; }
