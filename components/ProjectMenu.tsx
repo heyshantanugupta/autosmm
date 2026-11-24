@@ -12,11 +12,14 @@ interface Props {
   onExport: () => void;
   onImport: (file: File) => Promise<string | null>;
   onDelete: () => void;
+  /** Show the panel open in place (used in Settings) instead of as a dropdown. */
+  inline?: boolean;
 }
 
 /** A "save slot" menu: switch between projects, start a new one, back one up, or load one from a file. */
-export default function ProjectMenu({ index, onSwitch, onNew, onRename, onDuplicate, onExport, onImport, onDelete }: Props) {
-  const [open, setOpen] = useState(false);
+export default function ProjectMenu({ index, onSwitch, onNew, onRename, onDuplicate, onExport, onImport, onDelete, inline }: Props) {
+  const [openState, setOpen] = useState(false);
+  const open = inline || openState;
   const [mode, setMode] = useState<"menu" | "rename" | "delete">("menu");
   const [name, setName] = useState("");
   const [note, setNote] = useState<string | null>(null);
@@ -51,16 +54,16 @@ export default function ProjectMenu({ index, onSwitch, onNew, onRename, onDuplic
 
   return (
     <div className="project-menu" ref={root}>
-      <button type="button" className="btn secondary small project-btn" aria-expanded={open} aria-haspopup="true" onClick={() => (open ? close() : setOpen(true))}>
+      {!inline && <button type="button" className="btn secondary small project-btn" aria-expanded={open} aria-haspopup="true" onClick={() => (open ? close() : setOpen(true))}>
         <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M2.5 6a1.5 1.5 0 0 1 1.5-1.5h3.2l1.6 1.8H16A1.5 1.5 0 0 1 17.5 7.8v6.7A1.5 1.5 0 0 1 16 16H4a1.5 1.5 0 0 1-1.5-1.5z" />
         </svg>
         <span className="project-name">{active?.name}</span>
         <span aria-hidden="true">▾</span>
-      </button>
+      </button>}
 
       {open && (
-        <div className="project-panel" role="group" aria-label="Projects">
+        <div className={inline ? "project-panel inline" : "project-panel"} role="group" aria-label="Projects">
           {mode === "menu" && (
             <>
               <p className="project-help">Each project keeps its own brief, strategy, plan, drafts and results. Your API key and settings are shared.</p>

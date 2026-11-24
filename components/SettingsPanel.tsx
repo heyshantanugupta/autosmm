@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { requestModels } from "@/lib/client";
 import { getProvider, PROVIDERS, PROVIDER_GROUPS, type ProviderId } from "@/lib/providers";
+import SubNav from "./SubNav";
 import { UI_SCALES, type Settings } from "@/lib/storage";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const CUSTOM = "__custom__";
+type Tab = "model" | "projects" | "scale" | "version";
 
 export default function SettingsPanel({ settings, onChange, onClose, onClearData, projects }: Props) {
   const set = <K extends keyof Settings>(key: K, value: Settings[K]) => onChange({ ...settings, [key]: value });
@@ -22,6 +24,7 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
   const [finding, setFinding] = useState(false);
   const [findError, setFindError] = useState<string | null>(null);
   const [custom, setCustom] = useState(false);
+  const [tab, setTab] = useState<Tab>("model");
 
   // Suggested models first, then anything the key reported, then the current value if it is neither.
   const options: { id: string; label: string }[] = [...provider.models];
@@ -53,22 +56,24 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
     onChange({ ...settings, provider: id, apiKey: "", model: next.defaultModel });
   };
 
-  const jump = (id: string) => {
-    const el = document.getElementById(id);
-    el?.scrollIntoView({ behavior: "smooth", block: "center" });
-    if (id !== "app-version") el?.focus();
-  };
-
   return (
     <section className="settings" aria-labelledby="settings-title">
       <h2 id="settings-title">Settings</h2>
 
-      <div className="settings-jump" role="group" aria-label="Jump to">
-        {projects && <button type="button" className="btn secondary small" onClick={() => jump("settings-projects")}>Projects</button>}
-        <button type="button" className="btn secondary small" onClick={() => jump("model")}>Model</button>
-        <button type="button" className="btn secondary small" onClick={() => jump("app-version")}>Version</button>
-        <button type="button" className="btn secondary small" onClick={() => jump("ui-scale")}>UI Scale</button>
-      </div>
+      <SubNav
+        label="Settings sections"
+        value={tab}
+        options={[
+          { id: "model", label: "Model" },
+          ...(projects ? [{ id: "projects" as const, label: "Projects" }] : []),
+          { id: "scale", label: "UI Scale" },
+          { id: "version", label: "Version" },
+        ]}
+        onChange={setTab}
+      />
+
+      {tab === "model" && (
+      <>
 
       <div className="check">
         <input
@@ -206,15 +211,19 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
         )}
       </div>
 
-      {projects && (
-        <div className="field" id="settings-projects" tabIndex={-1}>
+      </>
+      )}
+
+      {tab === "projects" && projects && (
+        <div className="field" id="settings-projects">
           <label>Projects</label>
           <p className="hint">Switch, add, rename, back up or delete projects. Each keeps its own brief, plan and drafts.</p>
           {projects}
         </div>
       )}
 
-      <div className="field" id="ui-scale" tabIndex={-1}>
+      {tab === "scale" && (
+      <div className="field" id="ui-scale">
         <label>UI Scale</label>
         <p className="hint">Makes text and spacing smaller or larger. Saved on this computer.</p>
         <div className="scale-row">
@@ -225,10 +234,14 @@ export default function SettingsPanel({ settings, onChange, onClose, onClearData
           ))}
         </div>
       </div>
+      )}
 
-      <p className="hint" id="app-version" tabIndex={-1}>
-        AutoSMM version {process.env.NEXT_PUBLIC_APP_VERSION || "unknown"}
-      </p>
+      {tab === "version" && (
+        <div className="field" id="app-version">
+          <label>Version</label>
+          <p className="hint">AutoSMM version {process.env.NEXT_PUBLIC_APP_VERSION || "unknown"}</p>
+        </div>
+      )}
 
       <div className="row">
         <button type="button" className="btn" onClick={onClose}>

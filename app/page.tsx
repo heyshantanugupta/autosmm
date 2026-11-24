@@ -555,6 +555,7 @@ export default function Home() {
               projects={
                 ready && index ? (
                   <ProjectMenu
+                    inline
                     index={index}
                     onSwitch={switchProject}
                     onNew={newProject}

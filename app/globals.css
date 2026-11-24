@@ -1668,3 +1668,8 @@ fieldset.field > legend { padding: 0; margin-bottom: 10px; font-weight: 600; }
 .settings-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
 .scale-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .scale-row .btn[aria-pressed="true"] { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; }
+
+.project-panel.inline { position: static; width: auto; max-width: 560px; box-shadow: none; margin-top: 4px; }
+.settings .subnav { margin: 14px 0 26px; }
+.settings .field { margin-bottom: 8px; }
+.settings .row { margin-top: 28px; }
